@@ -59,7 +59,7 @@
         </div>
         <div class="discount-meta">
           <span class="discount-cost">${item.cost} Punkte</span>
-          <span class="discount-uses">${remaining}x verfuegbar</span>
+        <span class="discount-uses">${remaining}x verfuegbar</span>
         </div>
         <button class="btn btn-primary" data-id="${item.id}">Einlösen</button>
       `;
@@ -69,6 +69,7 @@
         redeemButton.textContent = 'Ausverkauft';
         redeemButton.classList.remove('btn-primary');
         redeemButton.classList.add('btn-ghost');
+        redeemButton.classList.add('btn-soldout');
       }
       redeemButton?.addEventListener('click', () => handleRedeem(item, card));
       container.appendChild(card);

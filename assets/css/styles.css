@@ -111,6 +111,7 @@ main {
   border-radius: 12px;
   background: #0b0f16;
   min-height: 260px;
+  max-height: 320px;
   object-fit: cover;
 }
 
@@ -119,6 +120,7 @@ main {
   width: 100%;
   height: auto;
   max-width: 100%;
+  max-height: 320px;
   border-radius: 12px;
   background: #0b0f16;
 }
@@ -232,6 +234,12 @@ main {
   background: transparent;
   color: var(--text);
   border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.btn-ghost.btn-soldout {
+  color: var(--muted);
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .input-hidden {

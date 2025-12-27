@@ -10,7 +10,7 @@
   const rewards = [
     { id: 'coffee', name: 'Gratis Kaffee', cost: 15 },
     { id: 'delivery', name: 'Versandkostenfrei', cost: 25 },
-    { id: 'voucher', name: '10€ Gutschein', cost: 50 },
+    { id: 'voucher', name: '10 EUR Gutschein', cost: 50 },
   ];
 
   function getBalance() {
@@ -32,16 +32,20 @@
     }
   }
 
-  function addPoints(amount, reason = 'Punkte hinzugefügt') {
+  function addPoints(amount, reason = 'Punkte hinzugefuegt') {
     const newBalance = getBalance() + amount;
     setBalance(newBalance);
-    showMessage(`${reason}: +${amount} Punkte`, 'success');
+    if (reason) {
+      showMessage(`${reason}: +${amount} Punkte`, 'success');
+      return;
+    }
+    showMessage(`+${amount} Punkte`, 'success');
   }
 
-  function deductPoints(amount, reason = 'Punkte eingelöst') {
+  function deductPoints(amount, reason = 'Punkte eingeloest') {
     const current = getBalance();
     if (current < amount) {
-      showMessage('Nicht genügend Punkte verfügbar.', 'warning');
+      showMessage('Nicht genuegend Punkte verfuegbar.', 'warning');
       return false;
     }
     setBalance(current - amount);

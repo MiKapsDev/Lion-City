@@ -11,6 +11,9 @@
   let stream;
   let scanning = false;
   const decodeScales = [1, 0.75, 0.5, 0.35];
+  const previewMaxHeight = 320;
+  const decodeCanvas = document.createElement('canvas');
+  const decodeContext = decodeCanvas.getContext('2d');
   const qrDetector =
     typeof BarcodeDetector !== 'undefined' ? new BarcodeDetector({ formats: ['qr_code'] }) : null;
 
@@ -90,13 +93,14 @@
   }
 
   function handleScanResult(data) {
-    if (resultEl) resultEl.textContent = data;
     const numericValue = parseNumericValue(data);
     if (Number.isFinite(numericValue)) {
-      window.PointsManager?.addPoints(numericValue, 'QR-Code');
+      if (resultEl) resultEl.textContent = `${numericValue}`;
+      window.PointsManager?.addPoints(numericValue, '');
       setStatus('QR-Code erkannt und Punkte gebucht.', 'success');
       return;
     }
+    if (resultEl) resultEl.textContent = data;
     setStatus('QR-Code erkannt, aber keine Zahl gefunden.', 'warning');
   }
 
@@ -124,6 +128,9 @@
   async function decodeWithBitmap(file) {
     try {
       const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      renderPreview(bitmap.width, bitmap.height, (context, width, height) => {
+        context.drawImage(bitmap, 0, 0, width, height);
+      });
       const result = await decodeFromSource(bitmap.width, bitmap.height, (context, width, height) => {
         context.drawImage(bitmap, 0, 0, width, height);
       });
@@ -143,6 +150,9 @@
     reader.onload = () => {
       const image = new Image();
       image.onload = async () => {
+        renderPreview(image.naturalWidth, image.naturalHeight, (context, width, height) => {
+          context.drawImage(image, 0, 0, width, height);
+        });
         const result = await decodeFromSource(
           image.naturalWidth,
           image.naturalHeight,
@@ -168,8 +178,7 @@
   }
 
   async function decodeFromSource(width, height, draw) {
-    const canvas = canvasEl;
-    const context = canvas.getContext('2d');
+    if (!decodeContext) return null;
     const maxSize = 1200;
     const baseScale = Math.min(1, maxSize / Math.max(width, height));
     const baseWidth = Math.max(1, Math.floor(width * baseScale));
@@ -178,16 +187,15 @@
     for (const scale of decodeScales) {
       const targetWidth = Math.max(1, Math.floor(baseWidth * scale));
       const targetHeight = Math.max(1, Math.floor(baseHeight * scale));
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      context.clearRect(0, 0, targetWidth, targetHeight);
-      draw(context, targetWidth, targetHeight);
-      showImagePreview();
-      const detectorValue = await detectWithBarcodeDetector(canvas);
+      decodeCanvas.width = targetWidth;
+      decodeCanvas.height = targetHeight;
+      decodeContext.clearRect(0, 0, targetWidth, targetHeight);
+      draw(decodeContext, targetWidth, targetHeight);
+      const detectorValue = await detectWithBarcodeDetector(decodeCanvas);
       if (detectorValue) {
         return detectorValue;
       }
-      const imageData = context.getImageData(0, 0, targetWidth, targetHeight);
+      const imageData = decodeContext.getImageData(0, 0, targetWidth, targetHeight);
       const code = window.jsQR?.(imageData.data, imageData.width, imageData.height, {
         inversionAttempts: 'attemptBoth',
       });
@@ -217,6 +225,21 @@
   function showImagePreview() {
     if (videoEl) videoEl.style.display = 'none';
     if (canvasEl) canvasEl.style.display = 'block';
+  }
+
+  function renderPreview(width, height, draw) {
+    if (!canvasEl) return;
+    showImagePreview();
+    const previewWidth = canvasEl.parentElement?.clientWidth || 320;
+    const scale = Math.min(1, previewWidth / width, previewMaxHeight / height);
+    const targetWidth = Math.max(1, Math.floor(width * scale));
+    const targetHeight = Math.max(1, Math.floor(height * scale));
+    canvasEl.width = targetWidth;
+    canvasEl.height = targetHeight;
+    const context = canvasEl.getContext('2d');
+    if (!context) return;
+    context.clearRect(0, 0, targetWidth, targetHeight);
+    draw(context, targetWidth, targetHeight);
   }
 
   function handleUploadChange(event) {
