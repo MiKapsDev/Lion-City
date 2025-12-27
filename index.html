@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loyalty Points Hub</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content container">
+      <p class="badge">Beta • QR Loyalty</p>
+      <h1>Loyalty Points Hub</h1>
+      <p class="subtitle">Scanne QR-Codes, sammle Punkte und löse sie in Shops oder Gruppen ein.</p>
+      <div class="hero__actions">
+        <button id="startScan" class="btn btn-primary">Jetzt QR-Code scannen</button>
+        <button id="earnDemo" class="btn btn-ghost">Demo-Punkte sammeln</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="scan" class="card">
+      <div class="section-header">
+        <h2>Cam Scan QR Codes</h2>
+        <p>Aktiviere die Kamera, scanne Codes und erhalte automatisch Punkte.</p>
+      </div>
+      <div class="scan-grid">
+        <div class="scan-preview">
+          <video id="cameraPreview" autoplay playsinline muted></video>
+          <canvas id="scanCanvas" aria-hidden="true"></canvas>
+          <p class="muted">Tippe auf "Scan starten" f&#252;r Kamera-Scan oder lade ein Foto hoch.</p>
+        </div>
+        <div class="scan-panel">
+          <p class="label">Scan-Ergebnis</p>
+          <p id="scanResult" class="scan-result">Noch kein Scan gestartet.</p>
+          <p id="scanStatus" class="status-pill">Bereit</p>
+          <button id="stopScan" class="btn btn-secondary">Scan stoppen</button>
+          <button id="uploadScan" class="btn btn-ghost">QR-Bild hochladen</button>
+          <input id="uploadInput" type="file" accept="image/*" capture="environment" class="input-hidden" />
+        </div>
+      </div>
+    </section>
+
+    <section id="points" class="card">
+      <div class="section-header">
+        <h2>Reward/Points</h2>
+        <p>Verwalte dein Punktekonto, sammle Belohnungen und löse Prämien ein.</p>
+      </div>
+      <div class="points-grid">
+        <div class="points-balance">
+          <p class="label">Aktueller Punktestand</p>
+          <p id="pointsBalance" class="points-value">0</p>
+          <div class="point-actions">
+            <button id="addPoints" class="btn btn-primary">+10 Punkte</button>
+            <button id="redeemPoints" class="btn btn-secondary">-5 Punkte</button>
+          </div>
+          <p id="pointsMessage" class="status-pill">Bereit</p>
+        </div>
+        <div class="reward-shop">
+          <p class="label">Shop mit Points</p>
+          <ul id="rewardList" class="reward-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="groups" class="card">
+      <div class="section-header">
+        <h2>Gruppe erstellen</h2>
+        <p>Starte eine Community, lade Mitglieder ein und teile eure Punkte-Erlebnisse.</p>
+      </div>
+      <form id="groupForm" class="form-grid" novalidate>
+        <div class="form-control">
+          <label for="groupName">Gruppenname</label>
+          <input type="text" id="groupName" name="groupName" placeholder="z. B. Team Weekend" required />
+          <small class="hint">Name erforderlich.</small>
+        </div>
+        <div class="form-control">
+          <label for="groupMembers">Mitglieder-E-Mails (durch Komma getrennt)</label>
+          <textarea id="groupMembers" name="groupMembers" rows="3" placeholder="mail@example.com, friend@example.com" required></textarea>
+          <small class="hint">Mindestens eine gültige E-Mail-Adresse.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Gruppe speichern</button>
+        <p id="groupStatus" class="status-pill">Noch keine Gruppe gespeichert.</p>
+      </form>
+      <div class="group-list">
+        <h3>Gespeicherte Gruppen</h3>
+        <p class="muted">Mitglieder lassen sich sp&#228;ter per E-Mail hinzuf&#252;gen.</p>
+        <ul id="groupList"></ul>
+      </div>
+    </section>
+
+    <section id="discounts" class="card">
+      <div class="section-header">
+        <h2>Discount-Anzeige für Shops</h2>
+        <p>Nutze deine Punkte, um exklusive Rabatte und Angebote freizuschalten.</p>
+      </div>
+      <div id="discountContainer" class="discount-grid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__content">
+      <p>Erstellt für eine schnelle QR-basierte Loyalty-Demo.</p>
+      <p class="muted">Speicherung erfolgt lokal im Browser.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="assets/js/points.js"></script>
+  <script src="assets/js/discounts.js"></script>
+  <script src="assets/js/groups.js"></script>
+  <script src="assets/js/scan.js"></script>
+</body>
+</html>
