@@ -93,7 +93,7 @@
     if (resultEl) resultEl.textContent = data;
     const numericValue = parseNumericValue(data);
     if (Number.isFinite(numericValue)) {
-      window.PointsManager?.addPoints(numericValue, `QR-Code: +${numericValue} Punkte`);
+      window.PointsManager?.addPoints(numericValue, 'QR-Code');
       setStatus('QR-Code erkannt und Punkte gebucht.', 'success');
       return;
     }

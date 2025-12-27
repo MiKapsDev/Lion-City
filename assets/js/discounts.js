@@ -61,12 +61,14 @@
           <span class="discount-cost">${item.cost} Punkte</span>
           <span class="discount-uses">${remaining}x verfuegbar</span>
         </div>
-        <button class="btn btn-primary" data-id="${item.id}">Einloesen</button>
+        <button class="btn btn-primary" data-id="${item.id}">Einlösen</button>
       `;
       const redeemButton = card.querySelector('button');
       redeemButton.disabled = remaining <= 0;
       if (remaining <= 0) {
         redeemButton.textContent = 'Ausverkauft';
+        redeemButton.classList.remove('btn-primary');
+        redeemButton.classList.add('btn-ghost');
       }
       redeemButton?.addEventListener('click', () => handleRedeem(item, card));
       container.appendChild(card);

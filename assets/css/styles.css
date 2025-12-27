@@ -116,6 +116,11 @@ main {
 
 #scanCanvas {
   display: none;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 12px;
+  background: #0b0f16;
 }
 
 .scan-panel {
@@ -203,6 +208,12 @@ main {
 
 .btn:active {
   transform: translateY(1px);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 .btn-primary {
