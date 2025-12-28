@@ -17,6 +17,7 @@
 
   function saveGroups(groups) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+    window.dispatchEvent(new Event('groups:updated'));
   }
 
   function updateGroup(id, updater) {
@@ -115,5 +116,10 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderGroups();
     form?.addEventListener('submit', handleSubmit);
+  });
+
+  window.addEventListener('demo:reset', () => {
+    renderGroups();
+    setStatus('Demo zurückgesetzt.', 'info');
   });
 })();

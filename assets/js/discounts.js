@@ -18,13 +18,24 @@
       id: 'tickets',
       title: '2-for-1 Kinotickets',
       description: 'Nur donnerstags einloesbar.',
+      minGroupMembers: 3,
       cost: 30,
       uses: 1,
     },
   ];
 
   const STORAGE_KEY = 'loyaltyDiscountUses';
+  const GROUPS_KEY = 'loyaltyGroups';
   const container = document.getElementById('discountContainer');
+
+  function hasQualifiedGroup(minMembers) {
+    try {
+      const groups = JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]');
+      return groups.some((group) => Array.isArray(group.members) && group.members.length >= minMembers);
+    } catch (error) {
+      return false;
+    }
+  }
 
   function loadUses() {
     try {
@@ -49,13 +60,20 @@
     container.innerHTML = '';
     discounts.forEach((item) => {
       const remaining = getRemainingUses(uses, item);
+      const meetsGroupRequirement = item.minGroupMembers
+        ? hasQualifiedGroup(item.minGroupMembers)
+        : true;
       const card = document.createElement('article');
       card.className = 'discount-card';
+      const requirementNote = item.minGroupMembers
+        ? `<p class="muted">Nur mit Gruppe (${item.minGroupMembers}+ Mitglieder).</p>`
+        : '';
       card.innerHTML = `
         <div>
           <p class="label">Shop mit Points</p>
           <h4>${item.title}</h4>
           <p class="muted">${item.description}</p>
+          ${requirementNote}
         </div>
         <div class="discount-meta">
           <span class="discount-cost">${item.cost} Punkte</span>
@@ -64,8 +82,12 @@
         <button class="btn btn-primary" data-id="${item.id}">Einlösen</button>
       `;
       const redeemButton = card.querySelector('button');
-      redeemButton.disabled = remaining <= 0;
-      if (remaining <= 0) {
+      redeemButton.disabled = remaining <= 0 || !meetsGroupRequirement;
+      if (!meetsGroupRequirement) {
+        redeemButton.textContent = 'Gruppe erforderlich';
+        redeemButton.classList.remove('btn-primary');
+        redeemButton.classList.add('btn-ghost');
+      } else if (remaining <= 0) {
         redeemButton.textContent = 'Ausverkauft';
         redeemButton.classList.remove('btn-primary');
         redeemButton.classList.add('btn-ghost');
@@ -79,13 +101,18 @@
   function handleRedeem(item, card) {
     const uses = loadUses();
     const remaining = getRemainingUses(uses, item);
+    if (item.minGroupMembers && !hasQualifiedGroup(item.minGroupMembers)) return;
     if (remaining <= 0) return;
-    if (window.PointsManager?.deductPoints(item.cost, item.title)) {
+    const result = window.PointsManager?.deductPoints(item.cost, item.title, {
+      includeKey: true,
+    });
+    if (result?.success) {
       uses[item.id] = remaining - 1;
       saveUses(uses);
       animateRedeem(card);
       renderDiscounts();
-      alert(`${item.title} gesichert!`);
+      const keySuffix = result.key ? ` Key: ${result.key}` : '';
+      alert(`${item.title} gesichert!${keySuffix}`);
     }
   }
 
@@ -97,4 +124,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', renderDiscounts);
+  window.addEventListener('demo:reset', renderDiscounts);
+  window.addEventListener('groups:updated', renderDiscounts);
 })();

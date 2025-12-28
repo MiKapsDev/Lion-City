@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loyalty Points Hub</title>
+  <title>Lion City Experience Hub</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+  <header class="site-header">
+    <div class="container site-header__content">
+      <a class="site-header__link" href="index.html" aria-label="Lion City Experience Hub home">
+        <img class="site-header__logo" src="assets/img/lion-logo.png" alt="Lion City logo" />
+      </a>
+      <h1 class="site-header__title">Lion City Experience Hub</h1>
+    </div>
+  </header>
   <header class="hero">
     <div class="hero__content container">
       <p class="badge">Beta • QR Loyalty</p>
-      <h1>Loyalty Points Hub</h1>
+      <h2>Lion City Experience Hub</h2>
       <p class="subtitle">Scanne QR-Codes, sammle Punkte und löse sie in Shops oder Gruppen ein.</p>
       <div class="hero__actions">
         <button id="startScan" class="btn btn-primary">Jetzt QR-Code scannen</button>
-        <button id="earnDemo" class="btn btn-ghost">Demo-Punkte sammeln</button>
       </div>
     </div>
   </header>
@@ -51,11 +58,12 @@
         <div class="points-balance">
           <p class="label">Aktueller Punktestand</p>
           <p id="pointsBalance" class="points-value">0</p>
-          <div class="point-actions">
-            <button id="addPoints" class="btn btn-primary">+10 Punkte</button>
-            <button id="redeemPoints" class="btn btn-secondary">-5 Punkte</button>
-          </div>
           <p id="pointsMessage" class="status-pill">Bereit</p>
+          <div class="transaction-panel">
+            <p class="label">Transaktionen</p>
+            <ul id="transactionList" class="transaction-list"></ul>
+          </div>
+          <button id="resetDemo" class="btn btn-reset" type="button" onclick="window.PointsManager?.resetDemo?.()">Demo zurücksetzen</button>
         </div>
         <div class="reward-shop">
           <p class="label">Shop mit Points</p>

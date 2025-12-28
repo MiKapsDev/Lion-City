@@ -64,6 +64,26 @@
     setStatus('Scan gestoppt.', 'info');
   }
 
+  function resetScanPanel() {
+    stopScan();
+    if (resultEl) resultEl.textContent = 'Noch kein Scan gestartet.';
+    setStatus('Bereit', 'info');
+    if (canvasEl) {
+      const context = canvasEl.getContext('2d');
+      if (context) {
+        context.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      }
+      canvasEl.style.display = 'none';
+    }
+    if (videoEl) {
+      videoEl.srcObject = null;
+      videoEl.style.display = 'block';
+    }
+    if (uploadInput) {
+      uploadInput.value = '';
+    }
+  }
+
   function setButtons(isScanning) {
     if (startBtn) startBtn.disabled = isScanning;
     if (stopBtn) stopBtn.disabled = !isScanning;
@@ -273,4 +293,6 @@
     uploadBtn?.addEventListener('click', handleUpload);
     uploadInput?.addEventListener('change', handleUploadChange);
   });
+
+  window.addEventListener('demo:reset', resetScanPanel);
 })();
