@@ -1,14 +1,16 @@
 (function () {
   const STORAGE_KEY = 'loyaltyPoints';
   const TRANSACTIONS_KEY = 'loyaltyTransactions';
+  const DOUBLE_POINTS_KEY = 'loyaltyDoublePointsUntil';
+  const DAILY_REWARD_KEY = 'loyaltyDailyRewards';
   const rewardListEl = document.getElementById('rewardList');
   const balanceEl = document.getElementById('pointsBalance');
   const messageEl = document.getElementById('pointsMessage');
 
   const rewards = [
     { id: 'coffee', name: 'Gratis Kaffee', cost: 15 },
-    { id: 'delivery', name: 'Versandkostenfrei', cost: 25 },
-    { id: 'voucher', name: '10 EUR Gutschein', cost: 50 },
+    { id: 'voucher', name: 'Gutschein 5€ für teilnehmde Shops', cost: 25 },
+    { id: 'double-points', name: 'Doppelte Punkte 1 std.', cost: 500 },
   ];
 
   function getBalance() {
@@ -117,18 +119,20 @@
 
   function addPoints(amount, reason = 'Punkte hinzugefuegt') {
     const safeReason = reason || 'QR-Scan';
+    const boostedAmount = applyDoublePoints(amount, safeReason);
     addTransaction({
       type: 'earn',
-      amount,
+      amount: boostedAmount,
       reason: safeReason,
     });
-    const newBalance = getBalance() + amount;
+    const newBalance = getBalance() + boostedAmount;
     setBalance(newBalance);
     if (safeReason) {
-      showMessage(`${safeReason}: +${amount} Punkte`, 'success');
+      const suffix = boostedAmount !== amount ? ' (2x aktiv)' : '';
+      showMessage(`${safeReason}: +${boostedAmount} Punkte${suffix}`, 'success');
       return;
     }
-    showMessage(`+${amount} Punkte`, 'success');
+    showMessage(`+${boostedAmount} Punkte`, 'success');
   }
 
   function deductPoints(amount, reason = 'Punkte eingeloest', options = {}) {
@@ -161,6 +165,74 @@
     messageEl.className = `status-pill status-${type}`;
   }
 
+  function getTodayStamp() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function loadDailyRewards() {
+    try {
+      return JSON.parse(localStorage.getItem(DAILY_REWARD_KEY) || '{}');
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function getDailyState() {
+    const stored = loadDailyRewards();
+    const today = getTodayStamp();
+    if (stored.date !== today) {
+      return { date: today, claims: {} };
+    }
+    return { date: stored.date, claims: stored.claims || {} };
+  }
+
+  function saveDailyState(state) {
+    try {
+      localStorage.setItem(DAILY_REWARD_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Konnte Daily-Rewards nicht speichern', error);
+    }
+  }
+
+  function hasClaimedToday(rewardId) {
+    const state = getDailyState();
+    return Boolean(state.claims && state.claims[rewardId]);
+  }
+
+  function markClaimedToday(rewardId) {
+    const state = getDailyState();
+    state.claims[rewardId] = true;
+    saveDailyState(state);
+  }
+
+  function getDoublePointsUntil() {
+    try {
+      const value = Number.parseInt(localStorage.getItem(DOUBLE_POINTS_KEY) || '0', 10);
+      return Number.isNaN(value) ? 0 : value;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  function isDoublePointsActive() {
+    return Date.now() < getDoublePointsUntil();
+  }
+
+  function activateDoublePoints(durationMs = 60 * 60 * 1000) {
+    try {
+      localStorage.setItem(DOUBLE_POINTS_KEY, String(Date.now() + durationMs));
+      showMessage('Doppelte Punkte fuer 1 Stunde aktiviert.', 'success');
+    } catch (error) {
+      console.error('Konnte Double-Points nicht speichern', error);
+    }
+  }
+
+  function applyDoublePoints(amount, reason) {
+    if (reason !== 'QR-Scan') return amount;
+    if (!isDoublePointsActive()) return amount;
+    return amount * 2;
+  }
+
   function updateUI() {
     if (balanceEl) {
       balanceEl.textContent = getBalance();
@@ -174,16 +246,27 @@
     rewardListEl.innerHTML = '';
     rewards.forEach((reward) => {
       const li = document.createElement('li');
+      const claimedToday = hasClaimedToday(reward.id);
       li.innerHTML = `
         <span>${reward.name}</span>
         <span class="muted">${reward.cost} Punkte</span>
       `;
       const redeemButton = document.createElement('button');
-      redeemButton.textContent = 'Einlösen';
+      redeemButton.textContent = claimedToday ? 'Heute eingeloest' : 'Einlösen';
       redeemButton.className = 'btn btn-secondary';
+      if (claimedToday) {
+        redeemButton.disabled = true;
+        redeemButton.classList.add('btn-ghost');
+      }
       redeemButton.addEventListener('click', () => {
+        if (hasClaimedToday(reward.id)) return;
         const result = deductPoints(reward.cost, reward.name, { includeKey: true });
         if (result.success) {
+          if (reward.id === 'double-points') {
+            activateDoublePoints();
+          }
+          markClaimedToday(reward.id);
+          renderRewards();
           const keySuffix = result.key ? ` Key: ${result.key}` : '';
           showMessage(`${reward.name} eingeloest!${keySuffix}`, 'success');
         }
@@ -196,6 +279,8 @@
   function handleReset() {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(TRANSACTIONS_KEY);
+    localStorage.removeItem(DOUBLE_POINTS_KEY);
+    localStorage.removeItem(DAILY_REWARD_KEY);
     localStorage.removeItem('loyaltyDiscountUses');
     localStorage.removeItem('loyaltyGroups');
     saveTransactions([]);
@@ -229,9 +314,6 @@
     resetDemo: handleReset,
   };
 })();
-
-
-
 
 
 

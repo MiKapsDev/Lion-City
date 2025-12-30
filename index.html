@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lion City Experience Hub</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 </head>
 <body>
   <header class="site-header">
@@ -51,8 +57,8 @@
 
     <section id="points" class="card">
       <div class="section-header">
-        <h2>Reward/Points</h2>
-        <p>Verwalte dein Punktekonto, sammle Belohnungen und löse Prämien ein.</p>
+        <h2>Deine Punkteübersicht</h2>
+        <p>Verwalte dein Punktekonto, sammle Belohnungen und löse sie täglich ein.</p>
       </div>
       <div class="points-grid">
         <div class="points-balance">
@@ -66,8 +72,22 @@
           <button id="resetDemo" class="btn btn-reset" type="button" onclick="window.PointsManager?.resetDemo?.()">Demo zurücksetzen</button>
         </div>
         <div class="reward-shop">
-          <p class="label">Shop mit Points</p>
+          <p class="label">Tägliche Rewards</p>
           <ul id="rewardList" class="reward-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="coupon-map" class="card">
+      <div class="section-header">
+        <h2>Coupon-Map Braunschweig</h2>
+        <p>Karte mit (fiktiv) teilnehmenden Shops in Braunschweig.</p>
+      </div>
+      <div class="map-grid">
+        <div id="couponMap" class="coupon-map" aria-label="Karte mit Coupon-Partnern"></div>
+        <div class="map-panel">
+          <p class="label">Teilnehmende Shops</p>
+          <ul id="couponMapList" class="map-list"></ul>
         </div>
       </div>
     </section>
@@ -100,8 +120,8 @@
 
     <section id="discounts" class="card">
       <div class="section-header">
-        <h2>Discount-Anzeige für Shops</h2>
-        <p>Nutze deine Punkte, um exklusive Rabatte und Angebote freizuschalten.</p>
+        <h2>Gruppen-Discounts</h2>
+        <p>Rabatte gibt es nur fuer Gruppen. Mindestgroesse ist 2 Mitglieder.</p>
       </div>
       <div id="discountContainer" class="discount-grid"></div>
     </section>
@@ -115,9 +135,15 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
   <script src="assets/js/points.js"></script>
   <script src="assets/js/discounts.js"></script>
   <script src="assets/js/groups.js"></script>
+  <script src="assets/js/map.js"></script>
   <script src="assets/js/scan.js"></script>
 </body>
 </html>

@@ -4,21 +4,23 @@
       id: 'smoothie',
       title: '20% auf Smoothies',
       description: 'Frische Bowls & Smoothies im City Store.',
+      minGroupMembers: 2,
       cost: 12,
       uses: 3,
     },
     {
       id: 'gear',
-      title: '5 EUR Rabatt auf Bike-Gear',
+      title: '5€ Rabatt auf Bike-Gear',
       description: 'Perfekt fuer das naechste Abenteuer.',
+      minGroupMembers: 3,
       cost: 18,
       uses: 2,
     },
     {
       id: 'tickets',
-      title: '2-for-1 Kinotickets',
-      description: 'Nur donnerstags einloesbar.',
-      minGroupMembers: 3,
+      title: 'ÖPNV Tageskarte Ermäßigung',
+      description: '30% Rabatt auf eine Tageskarte im Stadtgebiet.',
+      minGroupMembers: 4,
       cost: 30,
       uses: 1,
     },
@@ -77,7 +79,7 @@
         </div>
         <div class="discount-meta">
           <span class="discount-cost">${item.cost} Punkte</span>
-        <span class="discount-uses">${remaining}x verfuegbar</span>
+        <span class="discount-uses">${remaining}x verfügbar</span>
         </div>
         <button class="btn btn-primary" data-id="${item.id}">Einlösen</button>
       `;
@@ -127,3 +129,4 @@
   window.addEventListener('demo:reset', renderDiscounts);
   window.addEventListener('groups:updated', renderDiscounts);
 })();
+
