@@ -7,6 +7,7 @@
   const canvasEl = document.getElementById('scanCanvas');
   const resultEl = document.getElementById('scanResult');
   const statusEl = document.getElementById('scanStatus');
+  const scanPreviewEl = document.querySelector('.scan-frame');
   let scanLoop;
   let stream;
   let scanning = false;
@@ -79,6 +80,7 @@
       videoEl.srcObject = null;
       videoEl.style.display = 'block';
     }
+    scanPreviewEl?.classList.remove('is-static');
     if (uploadInput) {
       uploadInput.value = '';
     }
@@ -240,11 +242,13 @@
   function showVideoPreview() {
     if (videoEl) videoEl.style.display = 'block';
     if (canvasEl) canvasEl.style.display = 'none';
+    scanPreviewEl?.classList.remove('is-static');
   }
 
   function showImagePreview() {
     if (videoEl) videoEl.style.display = 'none';
     if (canvasEl) canvasEl.style.display = 'block';
+    scanPreviewEl?.classList.add('is-static');
   }
 
   function renderPreview(width, height, draw) {

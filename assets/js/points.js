@@ -6,6 +6,7 @@
   const rewardListEl = document.getElementById('rewardList');
   const balanceEl = document.getElementById('pointsBalance');
   const messageEl = document.getElementById('pointsMessage');
+  let lastRedeem = null;
 
   const rewards = [
     { id: 'coffee', name: 'Gratis Kaffee', cost: 15 },
@@ -50,12 +51,10 @@
 
   function generateKey() {
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const blocks = Array.from({ length: 3 }, () => {
-      return Array.from({ length: 4 }, () => {
-        return alphabet[Math.floor(Math.random() * alphabet.length)];
-      }).join('');
-    });
-    return `LC-${blocks.join('-')}`;
+    const value = Array.from({ length: 6 }, () => {
+      return alphabet[Math.floor(Math.random() * alphabet.length)];
+    }).join('');
+    return `LC-${value}`;
   }
 
   function addTransaction({ type, amount, reason, key }) {
@@ -241,42 +240,84 @@
     renderTransactions();
   }
 
-  function renderRewards() {
+    function renderRewards() {
     if (!rewardListEl) return;
+    const balance = getBalance();
     rewardListEl.innerHTML = '';
     rewards.forEach((reward) => {
       const li = document.createElement('li');
+      li.dataset.rewardId = reward.id;
       const claimedToday = hasClaimedToday(reward.id);
+      const hasRedeem = lastRedeem && lastRedeem.id === reward.id && lastRedeem.key;
+      if (hasRedeem) {
+        li.classList.add('reward-redeem');
+      }
       li.innerHTML = `
         <span>${reward.name}</span>
         <span class="muted">${reward.cost} Punkte</span>
       `;
-      const redeemButton = document.createElement('button');
-      redeemButton.textContent = claimedToday ? 'Heute eingeloest' : 'Einlösen';
-      redeemButton.className = 'btn btn-secondary';
-      if (claimedToday) {
-        redeemButton.disabled = true;
-        redeemButton.classList.add('btn-ghost');
-      }
-      redeemButton.addEventListener('click', () => {
-        if (hasClaimedToday(reward.id)) return;
-        const result = deductPoints(reward.cost, reward.name, { includeKey: true });
-        if (result.success) {
-          if (reward.id === 'double-points') {
-            activateDoublePoints();
+      if (hasRedeem) {
+        const codeWrap = document.createElement('div');
+        codeWrap.className = 'redeem-code';
+        codeWrap.dataset.key = lastRedeem.key;
+        codeWrap.innerHTML = `
+          <span class="redeem-code__label">Code</span>
+          <span class="redeem-code__value">${lastRedeem.key}</span>
+          <button class="redeem-copy" type="button" aria-label="Code kopieren">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 8V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4v-2h4V4h-8v4H8zM4 8h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zm0 2v10h8V10H4z" fill="currentColor"/>
+            </svg>
+          </button>
+        `;
+        const copyButton = codeWrap.querySelector('.redeem-copy');
+        copyButton.addEventListener('click', async () => {
+          const key = codeWrap.dataset.key;
+          if (!key) return;
+          try {
+            await navigator.clipboard?.writeText(key);
+            lastRedeem = null;
+            renderRewards();
+          } catch (error) {
+            copyButton.classList.add('is-error');
+            setTimeout(() => {
+              copyButton.classList.remove('is-error');
+            }, 1200);
           }
-          markClaimedToday(reward.id);
-          renderRewards();
-          const keySuffix = result.key ? ` Key: ${result.key}` : '';
-          showMessage(`${reward.name} eingeloest!${keySuffix}`, 'success');
+        });
+        li.appendChild(codeWrap);
+      } else {
+        const redeemButton = document.createElement('button');
+        redeemButton.textContent = claimedToday ? 'Heute eingelöst' : 'Einlösen';
+        redeemButton.className = 'btn btn-secondary';
+        if (claimedToday) {
+          redeemButton.disabled = true;
+          redeemButton.classList.add('btn-ghost');
+        } else if (balance < reward.cost) {
+          redeemButton.textContent = 'Nicht genug Punkte';
+          redeemButton.disabled = true;
+          redeemButton.classList.add('btn-ghost');
         }
-      });
-      li.appendChild(redeemButton);
+        redeemButton.addEventListener('click', () => {
+          if (hasClaimedToday(reward.id)) return;
+          if (balance < reward.cost) return;
+          const result = deductPoints(reward.cost, reward.name, { includeKey: true });
+          if (result.success) {
+            if (reward.id === 'double-points') {
+              activateDoublePoints();
+            }
+            markClaimedToday(reward.id);
+            lastRedeem = { id: reward.id, key: result.key || '' };
+            renderRewards();
+            const keySuffix = result.key ? ` Key: ${result.key}` : '';
+            showMessage(`${reward.name} eingeloest!${keySuffix}`, 'success');
+          }
+        });
+        li.appendChild(redeemButton);
+      }
       rewardListEl.appendChild(li);
     });
   }
-
-  function handleReset() {
+function handleReset() {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(TRANSACTIONS_KEY);
     localStorage.removeItem(DOUBLE_POINTS_KEY);
@@ -314,6 +355,8 @@
     resetDemo: handleReset,
   };
 })();
+
+
 
 
 

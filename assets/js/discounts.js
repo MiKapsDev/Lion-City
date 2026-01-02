@@ -29,6 +29,7 @@
   const STORAGE_KEY = 'loyaltyDiscountUses';
   const GROUPS_KEY = 'loyaltyGroups';
   const container = document.getElementById('discountContainer');
+  let lastRedeem = null;
 
   function hasQualifiedGroup(minMembers) {
     try {
@@ -59,6 +60,7 @@
   function renderDiscounts() {
     if (!container) return;
     const uses = loadUses();
+    const balance = window.PointsManager?.getBalance?.() ?? 0;
     container.innerHTML = '';
     discounts.forEach((item) => {
       const remaining = getRemainingUses(uses, item);
@@ -70,6 +72,20 @@
       const requirementNote = item.minGroupMembers
         ? `<p class="muted">Nur mit Gruppe (${item.minGroupMembers}+ Mitglieder).</p>`
         : '';
+      const hasRedeem = lastRedeem && lastRedeem.id === item.id && lastRedeem.key;
+      const redeemMarkup = hasRedeem
+        ? `
+          <div class="redeem-code" data-key="${lastRedeem.key}">
+            <span class="redeem-code__label">Code</span>
+            <span class="redeem-code__value">${lastRedeem.key}</span>
+            <button class="redeem-copy" type="button" aria-label="Code kopieren">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 8V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4v-2h4V4h-8v4H8zM4 8h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zm0 2v10h8V10H4z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        `
+        : `<button class="btn btn-primary" data-id="${item.id}">Einlösen</button>`;
       card.innerHTML = `
         <div>
           <p class="label">Shop mit Points</p>
@@ -81,21 +97,45 @@
           <span class="discount-cost">${item.cost} Punkte</span>
         <span class="discount-uses">${remaining}x verfügbar</span>
         </div>
-        <button class="btn btn-primary" data-id="${item.id}">Einlösen</button>
+        ${redeemMarkup}
       `;
-      const redeemButton = card.querySelector('button');
-      redeemButton.disabled = remaining <= 0 || !meetsGroupRequirement;
-      if (!meetsGroupRequirement) {
-        redeemButton.textContent = 'Gruppe erforderlich';
-        redeemButton.classList.remove('btn-primary');
-        redeemButton.classList.add('btn-ghost');
-      } else if (remaining <= 0) {
-        redeemButton.textContent = 'Ausverkauft';
-        redeemButton.classList.remove('btn-primary');
-        redeemButton.classList.add('btn-ghost');
-        redeemButton.classList.add('btn-soldout');
+      const redeemButton = card.querySelector('button.btn');
+      const copyButton = card.querySelector('.redeem-copy');
+      if (redeemButton) {
+        redeemButton.disabled = remaining <= 0 || !meetsGroupRequirement || balance < item.cost;
+        if (!meetsGroupRequirement) {
+          redeemButton.textContent = 'Gruppe erforderlich';
+          redeemButton.classList.remove('btn-primary');
+          redeemButton.classList.add('btn-ghost');
+        } else if (remaining <= 0) {
+          redeemButton.textContent = 'Ausverkauft';
+          redeemButton.classList.remove('btn-primary');
+          redeemButton.classList.add('btn-ghost');
+          redeemButton.classList.add('btn-soldout');
+        } else if (balance < item.cost) {
+          redeemButton.textContent = 'Nicht genug Punkte';
+          redeemButton.classList.remove('btn-primary');
+          redeemButton.classList.add('btn-ghost');
+        }
+        redeemButton.addEventListener('click', () => handleRedeem(item, card));
       }
-      redeemButton?.addEventListener('click', () => handleRedeem(item, card));
+      if (copyButton) {
+        copyButton.addEventListener('click', async () => {
+          const wrap = copyButton.closest('.redeem-code');
+          const key = wrap ? wrap.dataset.key : '';
+          if (!key) return;
+          try {
+            await navigator.clipboard?.writeText(key);
+            lastRedeem = null;
+            renderDiscounts();
+        } catch (error) {
+          copyButton.classList.add('is-error');
+          setTimeout(() => {
+            copyButton.classList.remove('is-error');
+          }, 1200);
+        }
+      });
+    }
       container.appendChild(card);
     });
   }
@@ -105,6 +145,8 @@
     const remaining = getRemainingUses(uses, item);
     if (item.minGroupMembers && !hasQualifiedGroup(item.minGroupMembers)) return;
     if (remaining <= 0) return;
+    const balance = window.PointsManager?.getBalance?.() ?? 0;
+    if (balance < item.cost) return;
     const result = window.PointsManager?.deductPoints(item.cost, item.title, {
       includeKey: true,
     });
@@ -112,9 +154,8 @@
       uses[item.id] = remaining - 1;
       saveUses(uses);
       animateRedeem(card);
+      lastRedeem = { id: item.id, key: result.key || '' };
       renderDiscounts();
-      const keySuffix = result.key ? ` Key: ${result.key}` : '';
-      alert(`${item.title} gesichert!${keySuffix}`);
     }
   }
 
@@ -129,4 +170,6 @@
   window.addEventListener('demo:reset', renderDiscounts);
   window.addEventListener('groups:updated', renderDiscounts);
 })();
+
+
 

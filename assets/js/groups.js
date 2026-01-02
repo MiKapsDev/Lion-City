@@ -46,8 +46,8 @@
         <strong>${group.name}</strong><br />
         <span class="muted">${group.members.join(', ')}</span>
         <div class="group-inline">
-          <input type="email" class="group-input" placeholder="Neue E-Mail hinzufuegen" />
-          <button class="btn btn-secondary" data-group="${group.id}">Hinzufuegen</button>
+          <input type="email" class="group-input" placeholder="Neue E-Mail hinzufügen" />
+          <button class="btn btn-secondary" data-group="${group.id}">Hinzufügen</button>
         </div>
       `;
       const addButton = item.querySelector('button');
@@ -73,7 +73,7 @@
           };
         });
         input.value = '';
-        setStatus('Mitglied hinzugefuegt.', 'success');
+        setStatus('Mitglied hinzugefügt.', 'success');
       });
       listEl.appendChild(item);
     });
@@ -123,3 +123,4 @@
     setStatus('Demo zurückgesetzt.', 'info');
   });
 })();
+

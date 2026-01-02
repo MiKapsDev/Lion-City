@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lion City Experience Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link
     rel="stylesheet"
@@ -27,7 +33,16 @@
       <h2>Lion City Experience Hub</h2>
       <p class="subtitle">Scanne QR-Codes, sammle Punkte und löse sie in Shops oder Gruppen ein.</p>
       <div class="hero__actions">
-        <button id="startScan" class="btn btn-primary">Jetzt QR-Code scannen</button>
+        <button id="startScan" class="btn btn-primary btn-iconic">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <g transform="translate(-1.8,-0.6) scale(1.27,1.08)">
+              <path d="M3 10.5a2 2 0 0 1 2-2h2.4l1-2h3.6l1 2H14a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10.5z" fill="currentColor"/>
+              <circle cx="9.5" cy="13.2" r="2.6" fill="currentColor"/>
+            </g>
+            <image href="assets/img/QR Symbol.png" x="8" y="1.0" width="14" height="14" preserveAspectRatio="xMidYMid meet"/>
+          </svg>
+          <span>Jetzt QR-Code scannen</span>
+        </button>
       </div>
     </div>
   </header>
@@ -40,16 +55,28 @@
       </div>
       <div class="scan-grid">
         <div class="scan-preview">
-          <video id="cameraPreview" autoplay playsinline muted></video>
-          <canvas id="scanCanvas" aria-hidden="true"></canvas>
+          <div class="scan-frame">
+            <video id="cameraPreview" autoplay playsinline muted></video>
+            <canvas id="scanCanvas" aria-hidden="true"></canvas>
+          </div>
           <p class="muted">Tippe auf "Scan starten" f&#252;r Kamera-Scan oder lade ein Foto hoch.</p>
         </div>
         <div class="scan-panel">
           <p class="label">Scan-Ergebnis</p>
           <p id="scanResult" class="scan-result">Noch kein Scan gestartet.</p>
           <p id="scanStatus" class="status-pill">Bereit</p>
-          <button id="stopScan" class="btn btn-secondary">Scan stoppen</button>
-          <button id="uploadScan" class="btn btn-ghost">QR-Bild hochladen</button>
+          <button id="stopScan" class="btn btn-secondary btn-iconic">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 8h8v8H8zM4 6a2 2 0 0 1 2-2h3v2H6v3H4V6zm10-2h4a2 2 0 0 1 2 2v4h-2V6h-4V4zM6 18h3v2H6a2 2 0 0 1-2-2v-3h2v3zm12-3h2v3a2 2 0 0 1-2 2h-4v-2h4v-3z" fill="currentColor"/>
+            </svg>
+            <span>Scan stoppen</span>
+          </button>
+          <button id="uploadScan" class="btn btn-ghost btn-iconic">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4zM8 8h8v8H8V8zm2 2v4h4v-4h-4z" fill="currentColor"/>
+            </svg>
+            <span>QR-Bild hochladen</span>
+          </button>
           <input id="uploadInput" type="file" accept="image/*" capture="environment" class="input-hidden" />
         </div>
       </div>

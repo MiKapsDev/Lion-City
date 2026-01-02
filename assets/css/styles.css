@@ -11,6 +11,10 @@
   --danger: #ef4444;
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
   --radius: 16px;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --accent-1: rgba(56, 189, 248, 0.18);
+  --accent-2: rgba(34, 197, 94, 0.16);
 }
 
 * {
@@ -19,17 +23,40 @@
 
 body {
   margin: 0;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 25%),
     radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.15), transparent 25%),
     var(--bg);
   color: var(--text);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 10% 30%, rgba(56, 189, 248, 0.12), transparent 40%),
+    radial-gradient(circle at 70% 20%, rgba(34, 197, 94, 0.12), transparent 45%),
+    radial-gradient(circle at 30% 80%, rgba(248, 250, 252, 0.04), transparent 40%);
+  opacity: 0.8;
+  pointer-events: none;
+  transform: translateZ(0);
+  z-index: -2;
 }
 
 .container {
   width: min(1200px, 92vw);
   margin: 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 .site-header {
@@ -75,13 +102,20 @@ body {
 
 .hero {
   padding: 56px 0 32px;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.1));
+  background-color: #0e1117;
+  background-image: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.1));
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .hero__content h2 {
   font-size: clamp(2rem, 5vw, 3rem);
   margin: 8px 0;
+}
+
+.hero__content {
 }
 
 .subtitle {
@@ -105,6 +139,8 @@ body {
   border-radius: 999px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+  animation: badgePulse 4.5s ease-in-out infinite;
 }
 
 main {
@@ -119,6 +155,43 @@ main {
   border-radius: var(--radius);
   padding: 22px;
   box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+main .card {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: cardIn 0.8s ease forwards;
+}
+
+main .card:nth-of-type(1) {
+  animation-delay: 0.1s;
+}
+
+main .card:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+main .card:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+main .card:nth-of-type(4) {
+  animation-delay: 0.4s;
+}
+
+main .card:nth-of-type(5) {
+  animation-delay: 0.5s;
+}
+
+.card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(56, 189, 248, 0.12);
+  transform: translateY(-4px);
 }
 
 .section-header {
@@ -324,6 +397,35 @@ main {
   border-radius: var(--radius);
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: hidden;
+  --scan-start: 18%;
+  --scan-end: 80%;
+}
+
+.scan-frame {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scan-frame::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.7), transparent);
+  opacity: 0.6;
+  animation: scanSweep 3.6s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scan-frame.is-static::after {
+  animation: none;
+  opacity: 0;
 }
 
 #cameraPreview {
@@ -333,6 +435,8 @@ main {
   min-height: 260px;
   max-height: 320px;
   object-fit: cover;
+  position: relative;
+  z-index: 0;
 }
 
 #scanCanvas {
@@ -361,6 +465,19 @@ main {
   border-radius: 12px;
   background: rgba(56, 189, 248, 0.1);
   border: 1px dashed rgba(56, 189, 248, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-result::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(56, 189, 248, 0.18), transparent);
+  opacity: 0.4;
+  transform: translateX(-60%);
+  animation: scanShimmer 4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .points-balance {
@@ -369,6 +486,13 @@ main {
   padding: 18px;
   border: 1px solid rgba(56, 189, 248, 0.35);
   box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.points-balance > * {
+  position: relative;
+  z-index: 1;
 }
 
 .points-value {
@@ -500,6 +624,18 @@ main {
   border-radius: 12px;
   background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reward-list li:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.12);
+}
+
+.reward-list li.reward-redeem {
+  animation: rewardRedeem 0.9s ease;
+  border-color: rgba(56, 189, 248, 0.45);
 }
 
 .reward-list li span:first-child {
@@ -514,7 +650,7 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.reward-list button {
+.reward-list .btn {
   margin-left: auto;
 }
 
@@ -524,7 +660,13 @@ main {
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.3s ease, background 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:active {
@@ -538,9 +680,43 @@ main {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  background: linear-gradient(135deg, #38bdf8 0%, #1cb2f1 45%, #0ea5e9 100%);
+  background-size: 140% 140%;
+  background-position: 35% 35%;
   color: #0b1020;
   box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
+}
+
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+  opacity: 0;
+  transform: translateX(-120%);
+}
+
+.btn:hover::after {
+  animation: btnSheen 0.85s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary:hover {
+  background-position: 80% 20%;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  display: block;
+}
+
+#startScan .btn-icon {
+  transform: translate(-2px, 2px);
 }
 
 .btn-secondary {
@@ -549,10 +725,19 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.btn-secondary:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 12px 24px rgba(56, 189, 248, 0.16);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--text);
   border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.btn-ghost:hover {
+  border-color: rgba(56, 189, 248, 0.5);
 }
 
 .btn-ghost.btn-soldout {
@@ -581,6 +766,7 @@ main {
   color: #7dd3fc;
   border: 1px solid rgba(56, 189, 248, 0.35);
   margin: 4px 0 0;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .status-success {
@@ -709,6 +895,157 @@ textarea:focus {
   font-size: 0.9rem;
 }
 
+.redeem-code {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+  color: #e2f7ff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.redeem-code__value {
+  white-space: nowrap;
+}
+
+.redeem-code__label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.redeem-code__value {
+  letter-spacing: 0.08em;
+}
+
+.redeem-copy {
+  border: none;
+  background: rgba(15, 23, 42, 0.35);
+  color: #e2f7ff;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.redeem-copy svg {
+  width: 16px;
+  height: 16px;
+}
+
+.redeem-copy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(56, 189, 248, 0.2);
+}
+
+.redeem-copy.is-error {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.55);
+}
+
+.reward-list .redeem-code {
+  width: 100%;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #0b1020;
+  margin-left: 0;
+}
+
+.reward-list .redeem-code__label {
+  color: rgba(11, 16, 32, 0.65);
+}
+
+.reward-list .redeem-copy {
+  background: rgba(11, 16, 32, 0.2);
+  color: #0b1020;
+  width: 36px;
+  height: 36px;
+}
+
+.discount-card .redeem-code {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #0b1020;
+  flex-wrap: nowrap;
+}
+
+.discount-card .redeem-code__label {
+  color: rgba(11, 16, 32, 0.65);
+}
+
+.discount-card .redeem-copy {
+  background: rgba(11, 16, 32, 0.2);
+  color: #0b1020;
+  width: 36px;
+  height: 36px;
+}
+
+.discount-status {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.discount-copy {
+  border: none;
+  background: rgba(15, 23, 42, 0.35);
+  color: #e2f7ff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.discount-copy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+}
+
+.discount-copy:disabled {
+  cursor: default;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+.discount-card.is-redeemed {
+  animation: redeemStamp 0.9s ease;
+}
+
+.discount-card.is-redeemed .discount-status {
+  animation: statusPop 1.2s ease;
+}
+
 .discount-uses {
   display: inline-flex;
   align-items: center;
@@ -761,6 +1098,170 @@ textarea:focus {
   100% {
     opacity: 0;
     transform: translateY(-10%);
+  }
+}
+
+@keyframes ambientShift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0);
+  }
+}
+
+@keyframes heroGlow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-3%, 2%, 0) scale(1.05);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes riseIn {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(56, 189, 248, 0.28),
+      0 0 10px rgba(56, 189, 248, 0.16);
+  }
+}
+
+@keyframes cardIn {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanSweep {
+  0% {
+    top: var(--scan-start);
+  }
+  50% {
+    top: var(--scan-end);
+  }
+  100% {
+    top: var(--scan-start);
+  }
+}
+
+@keyframes scanShimmer {
+  0% {
+    transform: translateX(-70%);
+  }
+  60% {
+    transform: translateX(70%);
+  }
+  100% {
+    transform: translateX(70%);
+  }
+}
+
+@keyframes pointsGlow {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(18px);
+    opacity: 0.9;
+  }
+}
+
+@keyframes btnSheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@keyframes rewardRedeem {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: none;
+  }
+  40% {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 18px 30px rgba(56, 189, 248, 0.22);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: none;
+  }
+}
+
+@keyframes redeemStamp {
+  0% {
+    transform: scale(0.98);
+  }
+  45% {
+    transform: scale(1.01);
+    box-shadow: 0 18px 30px rgba(34, 197, 94, 0.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes statusPop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -826,7 +1327,7 @@ textarea:focus {
     min-height: 280px;
   }
 
-  .reward-list button {
+  .reward-list .btn {
     width: 100%;
     margin-left: 0;
   }
