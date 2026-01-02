@@ -437,6 +437,8 @@ main .card:nth-of-type(5) {
   object-fit: cover;
   position: relative;
   z-index: 0;
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
 #scanCanvas {

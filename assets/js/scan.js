@@ -41,7 +41,21 @@
       videoEl.muted = true;
       videoEl.setAttribute('playsinline', 'true');
       videoEl.setAttribute('muted', 'true');
+      if (canvasEl) canvasEl.style.display = 'block';
+      scanPreviewEl?.classList.add('is-static');
       showVideoPreview();
+      if (videoEl) {
+        videoEl.style.opacity = '0';
+        videoEl.addEventListener(
+          'loadeddata',
+          () => {
+            if (canvasEl) canvasEl.style.display = 'none';
+            scanPreviewEl?.classList.remove('is-static');
+            videoEl.style.opacity = '1';
+          },
+          { once: true }
+        );
+      }
       await videoEl.play().catch(() => {});
       scanning = true;
       if (resultEl) resultEl.textContent = 'Suche nach QR-Code ...';
@@ -54,6 +68,7 @@
   }
 
   function stopScan() {
+    freezeFrame();
     if (scanLoop) cancelAnimationFrame(scanLoop);
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -79,6 +94,7 @@
     if (videoEl) {
       videoEl.srcObject = null;
       videoEl.style.display = 'block';
+      videoEl.style.opacity = '1';
     }
     scanPreviewEl?.classList.remove('is-static');
     if (uploadInput) {
@@ -249,6 +265,17 @@
     if (videoEl) videoEl.style.display = 'none';
     if (canvasEl) canvasEl.style.display = 'block';
     scanPreviewEl?.classList.add('is-static');
+  }
+
+  function freezeFrame() {
+    if (!canvasEl || !videoEl) return;
+    if (videoEl.readyState < videoEl.HAVE_CURRENT_DATA) return;
+    const context = canvasEl.getContext('2d');
+    if (!context) return;
+    canvasEl.width = videoEl.videoWidth || canvasEl.width;
+    canvasEl.height = videoEl.videoHeight || canvasEl.height;
+    context.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+    showImagePreview();
   }
 
   function renderPreview(width, height, draw) {
