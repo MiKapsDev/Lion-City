@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lion City Experience Hub - Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__content">
+      <a class="site-header__link" href="index.html" aria-label="Lion City Experience Hub home">
+        <img class="site-header__logo" src="assets/img/lion-logo.png" alt="Lion City logo" />
+      </a>
+      <h1 class="site-header__title">Lion City</h1>
+      <button id="menuToggle" class="btn btn-ghost btn-iconic menu-toggle" type="button" aria-label="Menü öffnen">
+        <span class="menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+      
+    </div>
+  </header>
+  <header class="hero">
+    <div class="hero__content container">
+      <p class="badge">City Map</p>
+      <h2>Coupon-Map Braunschweig</h2>
+      <p class="subtitle">Alle Partner-Shops auf einen Blick.</p>
+    </div>
+  </header>
+
+      <nav id="menuOverlay" class="menu-overlay" aria-hidden="true">
+    <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+      <button id="menuClose" class="menu-close" type="button" aria-label="Menü schließen">×</button>
+      <div class="menu-header">
+        <div class="menu-brand">
+          <img class="menu-logo" src="assets/img/lion-logo.png" alt="Lion City logo" />
+          <span>Lion City</span>
+        </div>
+        <h3 id="menuTitle" class="menu-title">Menü</h3>
+      </div>
+      <ul class="menu-list">
+        <li><a href="index.html">Start</a></li>
+        <li><a href="points.html">Punkte</a></li>
+        <li><a href="map.html">Map</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="groups.html">Gruppen</a></li>
+        <li><a href="discounts.html">Discounts</a></li>
+      </ul>
+      <div class="menu-actions">
+        <button id="loginTrigger" class="btn btn-secondary btn-small" type="button">Login</button>
+      </div>
+      <p class="muted">Quick Links für die Demo.</p>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section id="coupon-map" class="card">
+      <div class="section-header">
+        <h2>Coupon-Map Braunschweig</h2>
+        <p>Karte mit (fiktiv) teilnehmenden Shops in Braunschweig.</p>
+      </div>
+      <div class="map-grid">
+        <div class="map-frame subsection-card">
+          <h3 class="subsection-title">Karte</h3>
+          <div id="couponMap" class="coupon-map" aria-label="Karte mit Coupon-Partnern"></div>
+        </div>
+        <div class="map-panel subsection-card">
+          <h3 class="subsection-title">Liste</h3>
+          <p class="label">Teilnehmende Shops</p>
+          <ul id="couponMapList" class="map-list"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="loginOverlay" class="login-overlay" aria-hidden="true">
+    <div class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <div class="login-header">
+        <h3 id="loginTitle">Demo Login</h3>
+        <button id="loginClose" class="modal-close" type="button" aria-label="Login schließen">×</button>
+      </div>
+      <form id="loginForm" class="login-form" novalidate>
+        <label class="form-control">
+          <span>E-Mail</span>
+          <input type="email" name="email" placeholder="mail@example.com" required />
+        </label>
+        <label class="form-control">
+          <span>Passwort</span>
+          <input type="password" name="password" placeholder="••••••••" required />
+        </label>
+        <button class="btn btn-primary btn-small" type="submit">Einloggen</button>
+        <p id="loginStatus" class="status-pill">Dummy Login - keine echte Anmeldung.</p>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer__content">
+      <p>Erstellt für eine schnelle QR-basierte Loyalty-Demo.</p>
+      <p class="muted">Speicherung erfolgt lokal im Browser.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="assets/js/map.js"></script>
+  <script src="assets/js/login.js"></script>
+  <script src="assets/js/menu.js"></script>
+</body>
+</html>
+
+
+
+
+

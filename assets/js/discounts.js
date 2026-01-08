@@ -11,7 +11,7 @@
     {
       id: 'gear',
       title: '5€ Rabatt auf Bike-Gear',
-      description: 'Perfekt fuer das naechste Abenteuer.',
+      description: 'Perfekt für das nächste Abenteuer.',
       minGroupMembers: 3,
       cost: 18,
       uses: 2,

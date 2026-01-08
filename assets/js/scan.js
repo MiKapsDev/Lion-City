@@ -30,7 +30,7 @@
     }
     const mediaPromise = getUserMediaStream();
     if (!mediaPromise) {
-      setStatus('Kamera kann hier nicht gestartet werden. Bitte Seite ueber HTTPS oeffnen.', 'warning');
+      setStatus('Kamera kann hier nicht gestartet werden. Bitte Seite über HTTPS öffnen.', 'warning');
       return;
     }
 
@@ -131,6 +131,22 @@
   }
 
   function handleScanResult(data) {
+    const gamePayload = parseGamePayload(data);
+    if (gamePayload) {
+      const launched = window.GameManager?.launchGame?.(gamePayload);
+      if (launched) {
+        if (resultEl) {
+          resultEl.textContent = `Game: ${gamePayload.game} | Basis ${gamePayload.points} Punkte`;
+        }
+        setStatus('Spiel erkannt - starte Challenge.', 'success');
+        return;
+      }
+      if (resultEl) {
+        resultEl.textContent = `Game: ${gamePayload.game} | Basis ${gamePayload.points} Punkte`;
+      }
+      setStatus('Spiel erkannt, aber nicht unterstützt.', 'warning');
+      return;
+    }
     const numericValue = parseNumericValue(data);
     if (Number.isFinite(numericValue)) {
       if (resultEl) resultEl.textContent = `${numericValue}`;
@@ -148,6 +164,68 @@
     if (!match) return null;
     const parsed = Number.parseInt(match[0], 10);
     return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  function parseGamePayload(raw) {
+    if (!raw) return null;
+    const text = String(raw).trim();
+    if (!text) return null;
+    const jsonPayload = parseJsonPayload(text);
+    if (jsonPayload) return jsonPayload;
+    const queryPayload = parseQueryPayload(text);
+    if (queryPayload) return queryPayload;
+    const keyValuePayload = parseKeyValuePayload(text);
+    if (keyValuePayload) return keyValuePayload;
+    const simplePayload = parseSimplePayload(text);
+    if (simplePayload) return simplePayload;
+    return null;
+  }
+
+  function parseJsonPayload(text) {
+    if (!text.startsWith('{') || !text.endsWith('}')) return null;
+    try {
+      const parsed = JSON.parse(text);
+      if (!parsed || typeof parsed !== 'object') return null;
+      const game = String(parsed.game || parsed.title || '').trim();
+      const points = Number.parseInt(parsed.points, 10);
+      if (!game || !Number.isFinite(points)) return null;
+      return { game, points };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function parseQueryPayload(text) {
+    if (!text.includes('game=') && !text.includes('points=')) return null;
+    const params = new URLSearchParams(text.replace(/;/g, '&'));
+    const game = String(params.get('game') || '').trim();
+    const points = Number.parseInt(params.get('points'), 10);
+    if (!game || !Number.isFinite(points)) return null;
+    return { game, points };
+  }
+
+  function parseKeyValuePayload(text) {
+    if (!text.includes(':') && !text.includes('=')) return null;
+    const parts = text.split(/[;&,]/);
+    let game = '';
+    let points = null;
+    parts.forEach((part) => {
+      const [key, rawValue] = part.split(/[:=]/).map((entry) => entry.trim());
+      if (!key || !rawValue) return;
+      if (key.toLowerCase() === 'game') game = rawValue;
+      if (key.toLowerCase() === 'points') points = Number.parseInt(rawValue, 10);
+    });
+    if (!game || !Number.isFinite(points)) return null;
+    return { game, points };
+  }
+
+  function parseSimplePayload(text) {
+    const match = text.match(/^([a-z0-9_-]{3,})\s*[:|]\s*(-?\d+)/i);
+    if (!match) return null;
+    const game = match[1];
+    const points = Number.parseInt(match[2], 10);
+    if (!game || !Number.isFinite(points)) return null;
+    return { game, points };
   }
 
   function handleUpload() {

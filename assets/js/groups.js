@@ -59,7 +59,7 @@
           return;
         }
         if (!validateEmails([email])) {
-          setStatus('E-Mail-Adresse ist ungueltig.', 'warning');
+          setStatus('E-Mail-Adresse ist ungültig.', 'warning');
           return;
         }
         updateGroup(group.id, (current) => {
@@ -96,7 +96,7 @@
       return setStatus('Bitte einen Gruppenname angeben.', 'warning');
     }
     if (!members.length || !validateEmails(members)) {
-      return setStatus('Mindestens eine gueltige E-Mail-Adresse eintragen.', 'warning');
+      return setStatus('Mindestens eine gültige E-Mail-Adresse eintragen.', 'warning');
     }
 
     const groups = loadGroups();

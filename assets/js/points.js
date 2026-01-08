@@ -116,7 +116,7 @@
     });
   }
 
-  function addPoints(amount, reason = 'Punkte hinzugefuegt') {
+  function addPoints(amount, reason = 'Punkte hinzugefügt') {
     const safeReason = reason || 'QR-Scan';
     const boostedAmount = applyDoublePoints(amount, safeReason);
     addTransaction({
@@ -134,10 +134,10 @@
     showMessage(`+${boostedAmount} Punkte`, 'success');
   }
 
-  function deductPoints(amount, reason = 'Punkte eingeloest', options = {}) {
+  function deductPoints(amount, reason = 'Punkte eingelöst', options = {}) {
     const current = getBalance();
     if (current < amount) {
-      showMessage('Nicht genuegend Punkte verfuegbar.', 'warning');
+      showMessage('Nicht genügend Punkte verfügbar.', 'warning');
       return { success: false, key: null };
     }
     const newBalance = current - amount;
@@ -220,7 +220,7 @@
   function activateDoublePoints(durationMs = 60 * 60 * 1000) {
     try {
       localStorage.setItem(DOUBLE_POINTS_KEY, String(Date.now() + durationMs));
-      showMessage('Doppelte Punkte fuer 1 Stunde aktiviert.', 'success');
+      showMessage('Doppelte Punkte für 1 Stunde aktiviert.', 'success');
     } catch (error) {
       console.error('Konnte Double-Points nicht speichern', error);
     }
@@ -309,7 +309,7 @@
             lastRedeem = { id: reward.id, key: result.key || '' };
             renderRewards();
             const keySuffix = result.key ? ` Key: ${result.key}` : '';
-            showMessage(`${reward.name} eingeloest!${keySuffix}`, 'success');
+            showMessage(`${reward.name} eingelöst!${keySuffix}`, 'success');
           }
         });
         li.appendChild(redeemButton);
