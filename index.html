@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -25,7 +25,7 @@
         <img class="site-header__logo" src="assets/img/lion-logo.png" alt="Lion City logo" />
       </a>
       <h1 class="site-header__title">Lion City</h1>
-      <button id="menuToggle" class="btn btn-ghost btn-iconic menu-toggle" type="button" aria-label="MenÃ¼ Ã¶ffnen">
+      <button id="menuToggle" class="btn btn-ghost btn-iconic menu-toggle" type="button" aria-label="Men&uuml; &ouml;ffnen">
         <span class="menu-icon">
           <span></span>
           <span></span>
@@ -39,7 +39,7 @@
     <div class="hero__content container">
       <p class="badge">Beta QR Loyalty</p>
       <h2>Lion City Experience Hub</h2>
-      <p class="subtitle">Scanne QR-Codes, sammle Punkte und lÃ¶se sie in Shops oder Gruppen ein.</p>
+      <p class="subtitle">Scanne QR-Codes, sammle Punkte und löse sie in Shops oder Gruppen ein.</p>
       <div class="hero__actions">
         <button id="startScan" class="btn btn-primary btn-iconic">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,18 +57,19 @@
 
           <nav id="menuOverlay" class="menu-overlay" aria-hidden="true">
     <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
-      <button id="menuClose" class="menu-close" type="button" aria-label="MenÃ¼ schlieÃŸen">Ã—</button>
+      <button id="menuClose" class="menu-close" type="button" aria-label="Men&uuml; schlie&szlig;en">&times;</button>
       <div class="menu-header">
         <div class="menu-brand">
           <img class="menu-logo" src="assets/img/lion-logo.png" alt="Lion City logo" />
           <span>Lion City</span>
         </div>
-        <h3 id="menuTitle" class="menu-title">MenÃ¼</h3>
+        <h3 id="menuTitle" class="menu-title">Men&uuml;</h3>
       </div>
       <ul class="menu-list">
         <li><a href="index.html">Start</a></li>
         <li><a href="points.html">Punkte</a></li>
         <li><a href="map.html">Map</a></li>
+        <li><a href="heatmap.html">Heatmap</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="groups.html">Gruppen</a></li>
         <li><a href="discounts.html">Discounts</a></li>
@@ -76,7 +77,7 @@
       <div class="menu-actions">
         <button id="loginTrigger" class="btn btn-secondary btn-small" type="button">Login</button>
       </div>
-      <p class="muted">Quick Links fÃ¼r die Demo.</p>
+      <p class="muted">Quick Links f&uuml;r die Demo.</p>
     </div>
   </nav>
 
@@ -94,7 +95,7 @@
               <video id="cameraPreview" autoplay playsinline muted></video>
               <canvas id="scanCanvas" aria-hidden="true"></canvas>
             </div>
-            <p class="muted">Tippe auf "Scan starten" fÃ¼r Kamera-Scan oder lade ein Foto hoch.</p>
+            <p class="muted">Tippe auf "Scan starten" für Kamera-Scan oder lade ein Foto hoch.</p>
           </div>
           <div class="scan-panel subsection-card">
             <h3 class="subsection-title">Scan-Ergebnis</h3>
@@ -120,8 +121,8 @@
 
     <section id="points" class="card">
       <div class="section-header">
-        <h2>Deine PunkteÃ¼bersicht</h2>
-        <p>Verwalte dein Punktekonto, sammle Belohnungen und lÃ¶se sie tÃ¤glich ein.</p>
+        <h2>Deine Punkteübersicht</h2>
+        <p>Verwalte dein Punktekonto, sammle Belohnungen und löse sie täglich ein.</p>
       </div>
       <div class="points-grid">
         <div class="points-balance subsection-card">
@@ -133,11 +134,11 @@
             <p class="label">Transaktionen</p>
             <ul id="transactionList" class="transaction-list"></ul>
           </div>
-          <button id="resetDemo" class="btn btn-reset" type="button" onclick="window.PointsManager?.resetDemo?.()">Demo zurÃ¼cksetzen</button>
+          <button id="resetDemo" class="btn btn-reset" type="button" onclick="window.PointsManager?.resetDemo?.()">Demo zurücksetzen</button>
         </div>
         <div class="reward-shop subsection-card">
           <h3 class="subsection-title">Rewards</h3>
-          <p class="label">TÃ¤gliche Rewards</p>
+          <p class="label">Tägliche Rewards</p>
           <ul id="rewardList" class="reward-list"></ul>
         </div>
       </div>
@@ -158,17 +159,17 @@
           <h3 id="gameTitle">Snake</h3>
           <p id="gameSubtitle" class="muted">Spiele kurz, um deine Punkte zu multiplizieren.</p>
         </div>
-        <button id="gameClose" class="modal-close" type="button" aria-label="Spiel schlieÃŸen">Ã—</button>
+        <button id="gameClose" class="modal-close" type="button" aria-label="Spiel schließen">&times;</button>
       </div>
       <div class="game-body">
         <div class="game-canvas-wrap">
           <canvas id="snakeCanvas" width="360" height="360" aria-label="Snake Spiel"></canvas>
           <div class="game-dpad" aria-hidden="true">
-            <button class="dpad-btn" data-dir="up" type="button">â–²</button>
+            <button class="dpad-btn" data-dir="up" type="button">?</button>
             <div class="dpad-row">
-              <button class="dpad-btn" data-dir="left" type="button">â—„</button>
-              <button class="dpad-btn" data-dir="down" type="button">â–¼</button>
-              <button class="dpad-btn" data-dir="right" type="button">â–º</button>
+              <button class="dpad-btn" data-dir="left" type="button">?</button>
+              <button class="dpad-btn" data-dir="down" type="button">?</button>
+              <button class="dpad-btn" data-dir="right" type="button">?</button>
             </div>
           </div>
           <div class="game-hud">
@@ -205,7 +206,7 @@
     <div class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <div class="login-header">
         <h3 id="loginTitle">Demo Login</h3>
-        <button id="loginClose" class="modal-close" type="button" aria-label="Login schlieÃŸen">Ã—</button>
+        <button id="loginClose" class="modal-close" type="button" aria-label="Login schließen">&times;</button>
       </div>
       <form id="loginForm" class="login-form" novalidate>
         <label class="form-control">
@@ -214,7 +215,7 @@
         </label>
         <label class="form-control">
           <span>Passwort</span>
-          <input type="password" name="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required />
+          <input type="password" name="password" placeholder="••••••••" required />
         </label>
         <button class="btn btn-primary btn-small" type="submit">Einloggen</button>
         <p id="loginStatus" class="status-pill">Dummy Login - keine echte Anmeldung.</p>
@@ -224,7 +225,7 @@
 
   <footer class="footer">
     <div class="container footer__content">
-      <p>Erstellt fÃ¼r eine schnelle QR-basierte Loyalty-Demo.</p>
+      <p>Erstellt für eine schnelle QR-basierte Loyalty-Demo.</p>
       <p class="muted">Speicherung erfolgt lokal im Browser.</p>
     </div>
   </footer>
@@ -237,6 +238,9 @@
   <script src="assets/js/scan.js"></script>
 </body>
 </html>
+
+
+
 
 
 

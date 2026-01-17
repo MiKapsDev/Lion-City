@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0e1117" />
-  <title>Lion City Experience Hub - Punkte</title>
+  <title>Lion City Experience Hub - Heatmap</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -17,6 +17,12 @@
   <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon/favicon-96x96.png" />
   <link rel="shortcut icon" href="assets/favicon/favicon.ico" />
   <link rel="manifest" href="assets/favicon/site.webmanifest" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 </head>
 <body>
   <header class="site-header">
@@ -32,18 +38,17 @@
           <span></span>
         </span>
       </button>
-      
     </div>
   </header>
   <header class="hero">
     <div class="hero__content container">
-      <p class="badge">Punkte & Rewards</p>
-      <h2>Dein Punktekonto</h2>
-      <p class="subtitle">Verwalte dein Guthaben, sieh Transaktionen und löse Rewards ein.</p>
+      <p class="badge">City Map</p>
+      <h2>Heatmap Braunschweig</h2>
+      <p class="subtitle">&Uuml;bersicht der Heatmap.</p>
     </div>
   </header>
 
-      <nav id="menuOverlay" class="menu-overlay" aria-hidden="true">
+  <nav id="menuOverlay" class="menu-overlay" aria-hidden="true">
     <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
       <button id="menuClose" class="menu-close" type="button" aria-label="Men&uuml; schlie&szlig;en">&times;</button>
       <div class="menu-header">
@@ -70,27 +75,15 @@
   </nav>
 
   <main class="container">
-    <section id="points" class="card">
+    <section id="heatmap" class="card">
       <div class="section-header">
-        <h2>Deine Punkteübersicht</h2>
-        <p>Verwalte dein Punktekonto, sammle Belohnungen und löse sie täglich ein.</p>
+        <h2>Heatmap Braunschweig</h2>
+        <p>Heatmap der Stadt.</p>
       </div>
-      <div class="points-grid">
-        <div class="points-balance subsection-card">
-          <h3 class="subsection-title">Punktestand</h3>
-          <p class="label">Aktueller Punktestand</p>
-          <p id="pointsBalance" class="points-value">0</p>
-          <p id="pointsMessage" class="status-pill">Bereit</p>
-          <div class="transaction-panel">
-            <p class="label">Transaktionen</p>
-            <ul id="transactionList" class="transaction-list"></ul>
-          </div>
-          <button id="resetDemo" class="btn btn-reset" type="button" onclick="window.PointsManager?.resetDemo?.()">Demo zurücksetzen</button>
-        </div>
-        <div class="reward-shop subsection-card">
-          <h3 class="subsection-title">Rewards</h3>
-          <p class="label">Tägliche Rewards</p>
-          <ul id="rewardList" class="reward-list"></ul>
+      <div class="map-grid">
+        <div class="map-frame subsection-card">
+          <h3 class="subsection-title">Karte</h3>
+          <div id="heatMap" class="coupon-map" aria-label="Heatmap Braunschweig"></div>
         </div>
       </div>
     </section>
@@ -100,7 +93,7 @@
     <div class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <div class="login-header">
         <h3 id="loginTitle">Demo Login</h3>
-        <button id="loginClose" class="modal-close" type="button" aria-label="Login schließen">&times;</button>
+        <button id="loginClose" class="modal-close" type="button" aria-label="Login schlie&szlig;en">&times;</button>
       </div>
       <form id="loginForm" class="login-form" novalidate>
         <label class="form-control">
@@ -109,7 +102,7 @@
         </label>
         <label class="form-control">
           <span>Passwort</span>
-          <input type="password" name="password" placeholder="••••••••" required />
+          <input type="password" name="password" placeholder="********" required />
         </label>
         <button class="btn btn-primary btn-small" type="submit">Einloggen</button>
         <p id="loginStatus" class="status-pill">Dummy Login - keine echte Anmeldung.</p>
@@ -119,21 +112,17 @@
 
   <footer class="footer">
     <div class="container footer__content">
-      <p>Erstellt für eine schnelle QR-basierte Loyalty-Demo.</p>
+      <p>Erstellt f&uuml;r eine schnelle QR-basierte Loyalty-Demo.</p>
       <p class="muted">Speicherung erfolgt lokal im Browser.</p>
     </div>
   </footer>
 
-  <script src="assets/js/points.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="assets/js/heatmap.js"></script>
   <script src="assets/js/login.js"></script>
   <script src="assets/js/menu.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-

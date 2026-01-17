@@ -1,99 +1,6 @@
 (function () {
-  const mapEl = document.getElementById('couponMap');
+  const mapEl = document.getElementById('heatMap');
   if (!mapEl || !window.L) return;
-
-  const shops = [
-    {
-      id: 'staatstheater',
-      name: 'Staatstheater Braunschweig',
-      type: 'Theater',
-      address: 'Am Theater, 38100 Braunschweig',
-      offer: '5&nbsp;&euro; Erm&auml;&szlig;igter Eintritt',
-      cost: 60,
-      coords: [52.266, 10.532382489389382],
-    },
-    {
-      id: 'staedtisches-museum',
-      name: 'St&auml;dtisches Museum',
-      type: 'Museum',
-      address: 'Steintorwall 14, 38100 Braunschweig',
-      offer: '5&nbsp;&euro; Erm&auml;&szlig;igter Eintritt',
-      cost: 60,
-      coords: [52.2613, 10.532],
-    },
-    {
-      id: 'wasserwelt',
-      name: 'Wasserwelt Braunschweig',
-      type: 'Schwimmbad',
-      address: 'Am Sch&uuml;tzenpl. 1, 38114 Braunschweig',
-      offer: 'Gratis Eintritt Sauna',
-      cost: 60,
-      coords: [52.286, 10.5169],
-    },
-  ];
-
-  const REDEEM_KEY = 'loyaltyMapRedeems';
-
-  function loadRedeems() {
-    try {
-      return JSON.parse(localStorage.getItem(REDEEM_KEY) || '{}');
-    } catch (error) {
-      return {};
-    }
-  }
-
-  function saveRedeems(state) {
-    try {
-      localStorage.setItem(REDEEM_KEY, JSON.stringify(state));
-    } catch (error) {
-      console.error('Konnte Map-Redeems nicht speichern', error);
-    }
-  }
-
-  function getRedeemKey(shopId) {
-    const state = loadRedeems();
-    return state[shopId] || null;
-  }
-
-  function setRedeemKey(shopId, key) {
-    const state = loadRedeems();
-    state[shopId] = key;
-    saveRedeems(state);
-  }
-
-  function decodeEntities(value) {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = value;
-    return textarea.value;
-  }
-
-  function buildPopupContent(shop) {
-    const redeemKey = getRedeemKey(shop.id);
-    const redeemMarkup = redeemKey
-      ? `
-        <div class="redeem-code" data-key="${redeemKey}">
-          <span class="redeem-code__label">Code</span>
-          <span class="redeem-code__value">${redeemKey}</span>
-          <button class="redeem-copy" type="button" aria-label="Code kopieren">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 8h8v10H8V8zm2-4h8v2h2v12h-2v2H6v-4H4V4h6v2z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
-      `
-      : `
-        <button type="button" class="btn btn-secondary btn-small map-redeem-btn" data-shop-id="${shop.id}">
-          Einl&ouml;sen (${shop.cost} Punkte)
-        </button>
-      `;
-    return `
-      <strong>${shop.name}</strong><br>
-      ${shop.type}<br>
-      ${shop.address}<br>
-      <span class="map-points">${shop.offer}</span>
-      <div class="map-redeem">${redeemMarkup}</div>
-    `;
-  }
 
   const map = L.map(mapEl, {
     scrollWheelZoom: true,
@@ -357,6 +264,7 @@
     [52.280443, 10.440729],
     [52.280561, 10.441263],
   ];
+
   L.polygon(cityBoundary, {
     color: 'rgba(56, 189, 248, 0.65)',
     weight: 2,
@@ -380,118 +288,52 @@
     }
   ).addTo(map);
 
-  const listEl = document.getElementById('couponMapList');
-  const markerIcon = L.divIcon({
-    className: 'coupon-pin',
-    html: '<div class="coupon-pin__dot"></div><div class="coupon-pin__ring"></div>',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -16],
-  });
-  const markerById = new Map();
-  const shopById = new Map();
-  const markers = shops.map((shop, index) => {
-    shopById.set(shop.id, shop);
-    const marker = L.marker(shop.coords, { icon: markerIcon, shopIndex: index }).addTo(map);
-    marker.bindPopup(buildPopupContent(shop));
-    markerById.set(shop.id, marker);
+  const heatPoints = [
+    { coords: [52.2662, 10.5254], intensity: 0.9 },
+    { coords: [52.2627, 10.5339], intensity: 0.7 },
+    { coords: [52.2711, 10.5167], intensity: 0.5 },
+    { coords: [52.2786, 10.5204], intensity: 0.4 },
+    { coords: [52.2838, 10.5329], intensity: 0.8 },
+    { coords: [52.2574, 10.5249], intensity: 0.6 },
+    { coords: [52.2499, 10.5164], intensity: 0.3 },
+    { coords: [52.2526, 10.5418], intensity: 0.55 },
+    { coords: [52.2448, 10.5331], intensity: 0.45 },
+    { coords: [52.2679, 10.5478], intensity: 0.65 },
+    { coords: [52.2745, 10.5411], intensity: 0.5 },
+    { coords: [52.2904, 10.5287], intensity: 0.75 },
+    { coords: [52.2962, 10.5201], intensity: 0.6 },
+    { coords: [52.3017, 10.5363], intensity: 0.35 },
+    { coords: [52.2892, 10.5516], intensity: 0.4 },
+  ];
 
-    if (listEl) {
-      const item = document.createElement('li');
-      item.className = 'map-list-item';
-      item.dataset.index = String(index);
-      item.innerHTML = `
-        <button type="button" class="map-focus" data-index="${index}">
-          ${shop.name}
-        </button>
-        <span class="map-list-meta">${shop.address} &middot; ${shop.offer} &middot; ${shop.cost} Punkte</span>
-      `;
-      listEl.appendChild(item);
-    }
-
-    return marker;
-  });
-
-  function handleRedeemClick(target) {
-    const redeemButton = target.closest('.map-redeem-btn');
-    if (redeemButton) {
-      const shopId = redeemButton.getAttribute('data-shop-id');
-      if (!shopId) return true;
-      const shop = shopById.get(shopId);
-      if (!shop) return true;
-      const reason = `${decodeEntities(shop.name)} Gutschein`;
-      const result = window.PointsManager?.deductPoints?.(
-        shop.cost,
-        reason,
-        { includeKey: true }
-      );
-      if (!result?.success || !result.key) return true;
-      setRedeemKey(shopId, result.key);
-      const marker = markerById.get(shopId);
-      marker?.setPopupContent(buildPopupContent(shop));
-      return true;
-    }
-
-    const copyButton = target.closest('.redeem-copy');
-    if (copyButton) {
-      const wrap = copyButton.closest('.redeem-code');
-      const key = wrap?.getAttribute('data-key') || '';
-      if (!key) return true;
-      navigator.clipboard?.writeText(key).catch(() => {});
-      return true;
-    }
-    return false;
+  function getHeatColor(value) {
+    if (value >= 0.8) return '#ef4444';
+    if (value >= 0.6) return '#f97316';
+    if (value >= 0.4) return '#facc15';
+    return '#22c55e';
   }
 
-  map.on('popupopen', (event) => {
-    const popupEl = event.popup?.getElement?.();
-    if (!popupEl) return;
-    popupEl.addEventListener('click', (popupEvent) => {
-      const target = popupEvent.target;
-      if (!(target instanceof HTMLElement)) return;
-      if (handleRedeemClick(target)) {
-        popupEvent.preventDefault();
-        popupEvent.stopPropagation();
-      }
-    });
+  const qrIcon = L.icon({
+    iconUrl: 'assets/img/QR%20Symbol%202.jpeg',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    className: 'heatmap-qr-icon',
   });
 
-  if (listEl) {
-    const clearActiveItem = () => {
-      listEl.querySelectorAll('.map-list-item').forEach((item) => {
-        item.classList.remove('is-active');
-      });
-    };
-
-    const setActiveItem = (index) => {
-      clearActiveItem();
-      const targetItem = listEl.querySelector(`.map-list-item[data-index="${index}"]`);
-      if (targetItem) {
-        targetItem.classList.add('is-active');
-      }
-    };
-
-    listEl.addEventListener('click', (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const listItem = target.closest('.map-list-item');
-      if (!listItem) return;
-      const index = Number(listItem.getAttribute('data-index'));
-      const marker = markers[index];
-      if (!marker) return;
-      setActiveItem(index);
-      map.flyTo(marker.getLatLng(), 15, { animate: true, duration: 0.8 });
-      marker.openPopup();
+  function createHeatIcon(color, size) {
+    return L.divIcon({
+      className: 'heatmap-blob',
+      html: `<div style="width:${size}px;height:${size}px;background:radial-gradient(circle, ${color} 0%, ${color} 25%, rgba(0,0,0,0) 65%);"></div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
     });
-
-    map.on('click', clearActiveItem);
-    map.on('popupopen', (event) => {
-      const source = event.popup?._source;
-      const index = source?.options?.shopIndex;
-      if (typeof index === 'number') {
-        setActiveItem(index);
-      }
-    });
-    map.on('popupclose', clearActiveItem);
   }
+
+  heatPoints.forEach((point) => {
+    const color = getHeatColor(point.intensity);
+    const size = 60 + Math.round(point.intensity * 60);
+    const heatIcon = createHeatIcon(color, size);
+    L.marker(point.coords, { icon: heatIcon, interactive: false }).addTo(map);
+    L.marker(point.coords, { icon: qrIcon, interactive: false }).addTo(map);
+  });
 })();
