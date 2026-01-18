@@ -604,19 +604,33 @@ main .card:nth-of-type(5) {
 }
 
 @media (max-width: 600px) {
-  .leaflet-popup-content {
-    width: 100%;
-    margin: 12px 12px;
+  .coupon-map .leaflet-popup-content-wrapper {
+    width: min(260px, 72vw) !important;
+    padding: 6px 8px !important;
+    box-sizing: border-box;
   }
 
-  .leaflet-popup-content-wrapper {
-    width: min(320px, 80vw);
+  .coupon-map .leaflet-popup-content {
+    width: auto !important;
+    margin: 0 !important;
+    font-size: 0.78rem !important;
   }
 
   .map-redeem .btn {
     width: 100%;
-    font-size: 0.9rem;
-    padding: 10px 12px;
+    font-size: 0.74rem;
+    padding: 7px 9px;
+  }
+
+  .coupon-map .leaflet-popup-content {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .coupon-map .leaflet-popup-content .btn {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
