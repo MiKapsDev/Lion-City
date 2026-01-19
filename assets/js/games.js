@@ -98,7 +98,7 @@
     if (!gameState) return;
     if (gameState.status !== 'ready') return;
     if (countdownTimer) window.clearInterval(countdownTimer);
-    let remaining = 5;
+    let remaining = 3;
     gameState.status = 'countdown';
     if (startBtn) startBtn.disabled = true;
     setStatus(`Start in ${remaining} Sekunden ...`, 'info');
