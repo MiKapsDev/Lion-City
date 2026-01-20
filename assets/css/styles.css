@@ -35,16 +35,32 @@ body {
 
 body::before {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: -20%;
   background:
-    radial-gradient(circle at 10% 30%, rgba(56, 189, 248, 0.12), transparent 40%),
-    radial-gradient(circle at 70% 20%, rgba(34, 197, 94, 0.12), transparent 45%),
-    radial-gradient(circle at 30% 80%, rgba(248, 250, 252, 0.04), transparent 40%);
-  opacity: 0.8;
+    radial-gradient(circle at 10% 30%, rgba(56, 189, 248, 0.096), transparent 40%),
+    radial-gradient(circle at 70% 20%, rgba(34, 197, 94, 0.096), transparent 45%),
+    radial-gradient(circle at 30% 80%, rgba(248, 250, 252, 0.032), transparent 40%);
+  opacity: 1;
   pointer-events: none;
   transform: translateZ(0);
   z-index: -2;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  body {
+    background:
+      radial-gradient(circle at 10% 30%, rgba(56, 189, 248, 0.096), transparent 40%),
+      radial-gradient(circle at 70% 20%, rgba(34, 197, 94, 0.096), transparent 45%),
+      radial-gradient(circle at 30% 80%, rgba(248, 250, 252, 0.032), transparent 40%),
+      radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 25%),
+      radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.15), transparent 25%),
+      var(--bg);
+  }
+
+  body::before {
+    content: none;
+  }
 }
 
 .container {
@@ -740,6 +756,8 @@ main .card:nth-of-type(5) {
   border: 1px solid rgba(255, 255, 255, 0.04);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  transform: translateZ(0);
   --scan-start: 18%;
   --scan-end: 80%;
 }
@@ -748,6 +766,8 @@ main .card:nth-of-type(5) {
   position: relative;
   border-radius: 12px;
   overflow: hidden;
+  background: #0b0f16;
+  transform: translateZ(0);
 }
 
 .scan-frame::after {
@@ -780,6 +800,8 @@ main .card:nth-of-type(5) {
   z-index: 0;
   opacity: 1;
   transition: opacity 0.2s ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 #scanCanvas {
@@ -790,6 +812,8 @@ main .card:nth-of-type(5) {
   max-height: 320px;
   border-radius: 12px;
   background: #0b0f16;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .scan-panel {
@@ -821,6 +845,50 @@ main .card:nth-of-type(5) {
   transform: translateX(-60%);
   animation: scanShimmer 4s ease-in-out infinite;
   pointer-events: none;
+}
+
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1200;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  opacity: 0;
+  transform: translate(0, 0) rotate(0deg);
+  animation: confettiShoot var(--duration, 1600ms) ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+  mix-blend-mode: screen;
+}
+
+.points-burst {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #e2f7ff;
+  text-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.6),
+    0 0 18px rgba(56, 189, 248, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1201;
+}
+
+.points-burst.is-visible {
+  animation: pointsBurst 1.8s ease-out forwards;
 }
 
 .points-balance {
@@ -1954,5 +2022,49 @@ textarea:focus {
   .game-controls {
     align-items: center;
     text-align: center;
+  }
+}
+
+@keyframes confettiShoot {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--rot)) scale(0.9);
+  }
+}
+
+@keyframes pointsBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece,
+  .points-burst.is-visible {
+    animation: none;
+    opacity: 1;
   }
 }

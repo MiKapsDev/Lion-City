@@ -8,6 +8,8 @@
   const resultEl = document.getElementById('scanResult');
   const statusEl = document.getElementById('scanStatus');
   const scanPreviewEl = document.querySelector('.scan-frame');
+  const confettiLayer = document.getElementById('confettiLayer');
+  const pointsBurstEl = document.getElementById('pointsBurst');
   let scanLoop;
   let stream;
   let scanning = false;
@@ -22,6 +24,82 @@
     if (!statusEl) return;
     statusEl.textContent = text;
     statusEl.className = `status-pill status-${tone}`;
+  }
+
+  function triggerRedeemCelebration(points) {
+    if (!Number.isFinite(points) || points <= 0) return;
+    showPointsBurst(points);
+    launchConfetti();
+  }
+
+  function showPointsBurst(points) {
+    if (!pointsBurstEl) return;
+    const target = Math.max(0, Math.round(points));
+    const duration = 1200;
+    const start = performance.now();
+    pointsBurstEl.classList.remove('is-visible');
+    pointsBurstEl.textContent = '+0 Punkte';
+    void pointsBurstEl.offsetWidth;
+    pointsBurstEl.classList.add('is-visible');
+    if (pointsBurstEl._burstTimer) {
+      clearTimeout(pointsBurstEl._burstTimer);
+    }
+    const easeOutCubic = (value) => 1 - Math.pow(1 - value, 3);
+    const tick = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const current = Math.round(target * easeOutCubic(progress));
+      pointsBurstEl.textContent = `+${current} Punkte`;
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      }
+    };
+    requestAnimationFrame(tick);
+    pointsBurstEl._burstTimer = setTimeout(() => {
+      pointsBurstEl.classList.remove('is-visible');
+    }, 2700);
+  }
+
+  function launchConfetti() {
+    if (!confettiLayer) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#a855f7', '#f472b6', '#e2e8f0'];
+    const fragment = document.createDocumentFragment();
+    const bursts = [
+      { left: '0%', xMin: 18, xMax: 50, yMin: -40, yMax: -70 },
+      { left: '100%', xMin: -50, xMax: -18, yMin: -40, yMax: -70 },
+    ];
+    bursts.forEach((burst) => {
+      for (let i = 0; i < 40; i += 1) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        const x = randomBetween(burst.xMin, burst.xMax);
+        const y = randomBetween(burst.yMin, burst.yMax);
+        const rotation = randomBetween(-220, 220);
+        const delay = randomBetween(0, 160);
+        const duration = randomBetween(1600, 2400);
+        const width = randomBetween(6, 12);
+        const height = randomBetween(10, 18);
+        piece.style.left = burst.left;
+        piece.style.bottom = '0';
+        piece.style.width = `${width}px`;
+        piece.style.height = `${height}px`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.setProperty('--x', `${x}vw`);
+        piece.style.setProperty('--y', `${y}vh`);
+        piece.style.setProperty('--rot', `${rotation}deg`);
+        piece.style.setProperty('--delay', `${delay}ms`);
+        piece.style.setProperty('--duration', `${duration}ms`);
+        fragment.appendChild(piece);
+        setTimeout(() => {
+          piece.remove();
+        }, duration + delay + 200);
+      }
+    });
+    confettiLayer.appendChild(fragment);
+  }
+
+  function randomBetween(min, max) {
+    return Math.random() * (max - min) + min;
   }
 
   async function startScan() {
@@ -151,6 +229,7 @@
     if (Number.isFinite(numericValue)) {
       if (resultEl) resultEl.textContent = `${numericValue}`;
       window.PointsManager?.addPoints(numericValue, '');
+      triggerRedeemCelebration(numericValue);
       setStatus('QR-Code erkannt und Punkte gebucht.', 'success');
       return;
     }
