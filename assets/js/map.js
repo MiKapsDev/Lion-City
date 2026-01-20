@@ -33,6 +33,13 @@
   ];
 
   const REDEEM_KEY = 'loyaltyMapRedeems';
+  const DAILY_REDEEM_KEY = 'loyaltyMapDailyRedeems';
+  try {
+    localStorage.removeItem(REDEEM_KEY);
+    localStorage.removeItem(DAILY_REDEEM_KEY);
+  } catch (error) {
+    console.error('Konnte Map-Redeems nicht zuruecksetzen', error);
+  }
 
   function loadRedeems() {
     try {
@@ -52,13 +59,73 @@
 
   function getRedeemKey(shopId) {
     const state = loadRedeems();
-    return state[shopId] || null;
+    const entry = state[shopId];
+    const today = getTodayStamp();
+    if (!entry) return null;
+    if (typeof entry === 'string') {
+      if (entry) {
+        state[shopId] = { key: entry, date: today };
+        saveRedeems(state);
+        return entry;
+      }
+      return null;
+    }
+    if (entry.date !== today) {
+      delete state[shopId];
+      saveRedeems(state);
+      return null;
+    }
+    return entry.key || null;
   }
 
   function setRedeemKey(shopId, key) {
     const state = loadRedeems();
-    state[shopId] = key;
+    if (key) {
+      state[shopId] = { key, date: getTodayStamp() };
+    } else {
+      delete state[shopId];
+    }
     saveRedeems(state);
+  }
+
+  function getTodayStamp() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function loadDailyRedeems() {
+    try {
+      return JSON.parse(localStorage.getItem(DAILY_REDEEM_KEY) || '{}');
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function getDailyState() {
+    const stored = loadDailyRedeems();
+    const today = getTodayStamp();
+    if (stored.date !== today) {
+      return { date: today, claims: {} };
+    }
+    return { date: stored.date, claims: stored.claims || {} };
+  }
+
+  function saveDailyState(state) {
+    try {
+      localStorage.setItem(DAILY_REDEEM_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Konnte Daily-Map-Redemptions nicht speichern', error);
+    }
+  }
+
+  function hasClaimedToday(shopId) {
+    const state = getDailyState();
+    return Boolean(state.claims && state.claims[shopId]);
+  }
+
+  function markClaimedToday(shopId) {
+    const state = getDailyState();
+    state.claims[shopId] = true;
+    saveDailyState(state);
   }
 
   function decodeEntities(value) {
@@ -69,20 +136,27 @@
 
   function buildPopupContent(shop) {
     const redeemKey = getRedeemKey(shop.id);
-    const redeemMarkup = redeemKey
+    const claimedToday = hasClaimedToday(shop.id);
+    const redeemMarkup = claimedToday
       ? `
-        <div class="redeem-code" data-key="${redeemKey}">
+        <button type="button" class="btn btn-secondary btn-ghost" disabled>
+          Heute eingel&ouml;st
+        </button>
+      `
+      : redeemKey
+      ? `
+        <div class="redeem-code" data-key="${redeemKey}" data-shop-id="${shop.id}">
           <span class="redeem-code__label">Code</span>
           <span class="redeem-code__value">${redeemKey}</span>
           <button class="redeem-copy" type="button" aria-label="Code kopieren">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 8h8v10H8V8zm2-4h8v2h2v12h-2v2H6v-4H4V4h6v2z" fill="currentColor"/>
+              <path d="M8 8V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4v-2h4V4h-8v4H8zM4 8h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zm0 2v10h8V10H4z" fill="currentColor"/>
             </svg>
           </button>
         </div>
       `
       : `
-        <button type="button" class="btn btn-secondary btn-small map-redeem-btn" data-shop-id="${shop.id}">
+        <button type="button" class="btn btn-secondary map-redeem-btn" data-shop-id="${shop.id}">
           Einl&ouml;sen (${shop.cost} Punkte)
         </button>
       `;
@@ -93,6 +167,20 @@
       <span class="map-points">${shop.offer}</span>
       <div class="map-redeem">${redeemMarkup}</div>
     `;
+  }
+
+  async function copyRedeemKey(copyButton) {
+    const wrap = copyButton.closest('.redeem-code');
+    const key = wrap?.getAttribute('data-key') || '';
+    if (!key) return;
+    try {
+      await navigator.clipboard?.writeText(key);
+    } catch (error) {
+      copyButton.classList.add('is-error');
+      setTimeout(() => {
+        copyButton.classList.remove('is-error');
+      }, 1200);
+    }
   }
 
   const map = L.map(mapEl, {
@@ -412,11 +500,13 @@
     return marker;
   });
 
-  function handleRedeemClick(target) {
+  async function handleRedeemClick(target) {
     const redeemButton = target.closest('.map-redeem-btn');
     if (redeemButton) {
+      if (redeemButton.disabled) return true;
       const shopId = redeemButton.getAttribute('data-shop-id');
       if (!shopId) return true;
+      if (hasClaimedToday(shopId)) return true;
       const shop = shopById.get(shopId);
       if (!shop) return true;
       const reason = `${decodeEntities(shop.name)} Gutschein`;
@@ -429,15 +519,35 @@
       setRedeemKey(shopId, result.key);
       const marker = markerById.get(shopId);
       marker?.setPopupContent(buildPopupContent(shop));
+      try {
+        await navigator.clipboard?.writeText(result.key);
+      } catch (error) {
+        const popupEl = marker?.getPopup()?.getElement?.();
+        const copyButton = popupEl?.querySelector?.('.redeem-copy');
+        if (copyButton instanceof HTMLElement) {
+          copyButton.classList.add('is-error');
+          setTimeout(() => {
+            copyButton.classList.remove('is-error');
+          }, 1200);
+        }
+      }
       return true;
     }
 
     const copyButton = target.closest('.redeem-copy');
     if (copyButton) {
+      await copyRedeemKey(copyButton);
       const wrap = copyButton.closest('.redeem-code');
-      const key = wrap?.getAttribute('data-key') || '';
-      if (!key) return true;
-      navigator.clipboard?.writeText(key).catch(() => {});
+      const shopId = wrap?.getAttribute('data-shop-id') || '';
+      if (shopId) {
+        markClaimedToday(shopId);
+        setRedeemKey(shopId, null);
+        const shop = shopById.get(shopId);
+        const marker = markerById.get(shopId);
+        if (shop && marker) {
+          marker.setPopupContent(buildPopupContent(shop));
+        }
+      }
       return true;
     }
     return false;
@@ -446,10 +556,12 @@
   map.on('popupopen', (event) => {
     const popupEl = event.popup?.getElement?.();
     if (!popupEl) return;
-    popupEl.addEventListener('click', (popupEvent) => {
-      const target = popupEvent.target;
-      if (!(target instanceof HTMLElement)) return;
-      if (handleRedeemClick(target)) {
+    popupEl.addEventListener('click', async (popupEvent) => {
+      const rawTarget = popupEvent.target;
+      const target = rawTarget instanceof Element ? rawTarget : rawTarget?.parentElement;
+      if (!target) return;
+      const handled = await handleRedeemClick(target);
+      if (handled) {
         popupEvent.preventDefault();
         popupEvent.stopPropagation();
       }
