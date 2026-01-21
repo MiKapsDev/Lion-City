@@ -8,10 +8,12 @@
   const basePointsEl = document.getElementById('gameBasePoints');
   const finalPointsEl = document.getElementById('gameFinalPoints');
   const statusEl = document.getElementById('gameStatus');
+  const hudEl = document.querySelector('.game-hud');
   const startBtn = document.getElementById('gameStart');
   const giveUpBtn = document.getElementById('gameGiveUp');
   const closeBtn = document.getElementById('gameClose');
   const dpadButtons = document.querySelectorAll('.dpad-btn');
+  const startLabel = startBtn?.textContent?.trim() || 'Start';
 
   const gridSize = 18;
   let gameState = null;
@@ -24,6 +26,11 @@
     if (!statusEl) return;
     statusEl.textContent = text;
     statusEl.className = `status-pill status-${tone}`;
+  }
+
+  function setGameOverHighlight(active) {
+    if (!hudEl) return;
+    hudEl.classList.toggle('is-game-over', active);
   }
 
   function setOverlayVisible(visible) {
@@ -49,6 +56,11 @@
     };
     lastDir = { x: 1, y: 0 };
     queuedDir = null;
+    setGameOverHighlight(false);
+    if (startBtn) {
+      startBtn.textContent = startLabel;
+      startBtn.disabled = false;
+    }
     updateHud();
   }
 
@@ -100,7 +112,11 @@
     if (countdownTimer) window.clearInterval(countdownTimer);
     let remaining = 3;
     gameState.status = 'countdown';
-    if (startBtn) startBtn.disabled = true;
+    setGameOverHighlight(false);
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.textContent = String(remaining);
+    }
     setStatus(`Start in ${remaining} Sekunden ...`, 'info');
     countdownTimer = window.setInterval(() => {
       remaining -= 1;
@@ -108,10 +124,16 @@
         window.clearInterval(countdownTimer);
         countdownTimer = null;
         gameState.status = 'running';
+        if (startBtn) {
+          startBtn.textContent = 'Los!';
+        }
         setStatus('Läuft - sammle Futter für einen Höheren Multiplikator.', 'success');
         if (tickHandle) window.clearTimeout(tickHandle);
         scheduleNextTick();
         return;
+      }
+      if (startBtn) {
+        startBtn.textContent = String(remaining);
       }
       setStatus(`Start in ${remaining} Sekunden ...`, 'info');
     }, 1000);
@@ -122,10 +144,19 @@
     if (tickHandle) window.clearTimeout(tickHandle);
     tickHandle = null;
     gameState.status = 'over';
-    if (startBtn) startBtn.disabled = false;
     if (canceled) {
+      setGameOverHighlight(false);
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.textContent = startLabel;
+      }
       setStatus('Spiel abgebrochen. Keine Punkte gebucht.', 'warning');
       return;
+    }
+    setGameOverHighlight(true);
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.textContent = startLabel;
     }
     if (!gameState.awarded) {
       const multiplier = getMultiplier(gameState.score);
@@ -133,9 +164,9 @@
       const reason = `QR-Game Snake (${gameState.score} Score, ${multiplier.toFixed(1)}x)`;
       if (finalPoints > 0) {
         window.PointsManager?.addPoints(finalPoints, reason);
-        setStatus(`Game beendet: +${finalPoints} Punkte gebucht.`, 'success');
+        setStatus(`Game Over! +${finalPoints} Punkte gebucht.`, 'danger');
       } else {
-        setStatus('Game beendet: Keine Punkte erhalten.', 'warning');
+        setStatus('Game Over! Keine Punkte erhalten.', 'danger');
       }
       gameState.awarded = true;
     }
@@ -319,6 +350,7 @@
       window.clearInterval(countdownTimer);
       countdownTimer = null;
     }
+    setGameOverHighlight(false);
     setOverlayVisible(false);
     gameState = null;
   }

@@ -31,6 +31,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  touch-action: manipulation;
 }
 
 body::before {
@@ -1078,6 +1079,7 @@ main .card:nth-of-type(5) {
   gap: 8px;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .btn:active {
@@ -1586,6 +1588,15 @@ textarea:focus {
   gap: 6px;
 }
 
+.game-hud.is-game-over div {
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35);
+}
+
+.game-hud.is-game-over strong {
+  color: #fca5a5;
+}
+
 .game-hud strong {
   font-size: 1.1rem;
 }
@@ -1618,6 +1629,7 @@ textarea:focus {
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
   transition: transform 0.15s ease, border-color 0.2s ease;
+  touch-action: manipulation;
 }
 
 .dpad-btn:active {
