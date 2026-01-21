@@ -248,7 +248,7 @@
       const li = document.createElement('li');
       li.dataset.rewardId = reward.id;
       const claimedToday = hasClaimedToday(reward.id);
-      const hasRedeem = lastRedeem && lastRedeem.id === reward.id && lastRedeem.key;
+      const hasRedeem = reward.id !== 'double-points' && lastRedeem && lastRedeem.id === reward.id && lastRedeem.key;
       if (hasRedeem) {
         li.classList.add('reward-redeem');
       }
@@ -304,11 +304,13 @@
           if (result.success) {
             if (reward.id === 'double-points') {
               activateDoublePoints();
+              lastRedeem = null;
+            } else {
+              lastRedeem = { id: reward.id, key: result.key || '' };
             }
             markClaimedToday(reward.id);
-            lastRedeem = { id: reward.id, key: result.key || '' };
             renderRewards();
-            const keySuffix = result.key ? ` Key: ${result.key}` : '';
+            const keySuffix = result.key && reward.id !== 'double-points' ? ` Key: ${result.key}` : '';
             showMessage(`${reward.name} eingelöst!${keySuffix}`, 'success');
           }
         });
